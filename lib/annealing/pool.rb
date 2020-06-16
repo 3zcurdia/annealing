@@ -26,7 +26,7 @@ module Annealing
 
     def calc_delta
       collection.each_cons(2).sum do |a, b|
-        a.send(delta_method, b)
+        a.public_send(delta_method, b)
       end
     end
   end
