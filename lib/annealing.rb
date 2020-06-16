@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'logger'
 require 'annealing/version'
+require 'annealing/utils'
 require 'annealing/pool'
 require 'annealing/simulator'
 

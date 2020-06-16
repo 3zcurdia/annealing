@@ -3,46 +3,42 @@
 module Annealing
   # It runs simulated annealing
   class Simulator
-    attr_accessor :temperature, :cooling_rate
+    attr_reader :temperature, :cooling_rate
 
-    def initialize(**data)
-      @temperature = data[:temperature]
-      @cooling_rate = data[:cooling_rate].negative? ? data[:cooling_rate] : (-1 * data[:cooling_rate])
+    def initialize(temperature:, cooling_rate: -1.0)
+      @temperature = temperature
+      @cooling_rate = cooling_rate
 
       raise 'Invalid initial temperature' if temperature.negative?
+
+      normalize_cooling_rate
     end
 
     def run(collection)
-      return Pool.new([]) if collection.empty?
+      return Pool.zero if collection.empty?
 
-      current = Pool.new(collection.shuffle)
-      best = Pool.new(current.collection)
-      puts "Original delta: #{current.delta}"
-
+      best = current = Pool.new(collection.shuffle)
+      logger.debug(" Original: #{current}")
       cool_down do |temp|
-        solution = Pool.new(current.collection)
-        solution.rand_swap!
-
-        current = solution if acceptance(current.delta, solution.delta, temp) > rand
-        best = current if current.delta < best.delta
+        current = current.solution_at(temp)
+        best = current if current.better_than?(best)
       end
-      puts "Best delta: #{best.delta}"
+      logger.debug("Optimized: #{best}")
       best
     end
 
     private
 
-    def acceptance(delta, new_delta, temperature)
-      return 1.0 if new_delta < delta
-
-      pow = (delta - new_delta) / temperature
-      Math::E**pow
+    def logger
+      @logger ||= Logger.new(STDOUT)
     end
 
     def cool_down
-      (temperature..0).step(cooling_rate).each do |temp|
-        yield temp
-      end
+      (temperature..0).step(cooling_rate).each { |temp| yield temp }
+    end
+
+    def normalize_cooling_rate
+      @cooling_rate = -1.0 * cooling_rate if cooling_rate.positive?
     end
   end
 end

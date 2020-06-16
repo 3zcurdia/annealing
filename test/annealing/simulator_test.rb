@@ -18,21 +18,9 @@ module Annealing
       Simulator.new(temperature: 10_000, cooling_rate: 0.003)
     end
 
-    def test_acceptance_one
-      assert_equal 1.0, simulator.send(:acceptance, 1, 1, 10_000)
-    end
-
-    def test_acceptance_lower_new_delta
-      assert_equal 1.0, simulator.send(:acceptance, 2, 1, 1)
-    end
-
-    def test_acceptance_negative
-      assert_equal Math::E, simulator.send(:acceptance, 1, 2, -1)
-    end
-
     def test_run
       simulation = simulator.run(collection)
-      assert simulation.delta < 400
+      assert simulation.delta < 355
     end
   end
 end

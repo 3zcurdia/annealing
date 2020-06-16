@@ -8,6 +8,10 @@ class Location
     @y = pos_y
   end
 
+  def inspect
+    "(#{x},#{y})"
+  end
+
   def delta(location)
     dx = (x - location.x).abs
     dy = (y - location.y).abs
