@@ -7,7 +7,9 @@ class AnnealingTest < Minitest::Test
     refute_nil ::Annealing::VERSION
   end
 
-  def test_simulation
-    assert_equal [], Annealing.simulate([], temperature: 10_000.0, cooling_rate: 0.003)
+  def test_delta
+    vec_a = Location.new(1, 0)
+    vec_b = Location.new(1, 3)
+    assert_equal 3, vec_a.delta(vec_b)
   end
 end

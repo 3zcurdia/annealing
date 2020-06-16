@@ -7,6 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Annealing::VERSION
   spec.authors       = ['Luis Ezcurdia Razo']
   spec.email         = ['ing.ezcurdia@gmail.com']
+  spec.license       = 'MIT'
 
   spec.summary       = 'Simulated Annealing algoritm'
   spec.description   = 'Simulated Annealing algoritm implementation.'

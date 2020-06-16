@@ -1,0 +1,18 @@
+inherit_from: .rubocop_todo.yml
+
+Metrics/AbcSize:
+  Max: 25
+Metrics/MethodLength:
+  Max: 15
+Layout/LineLength:
+  Max: 120
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: false
+Style/HashEachMethods:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
