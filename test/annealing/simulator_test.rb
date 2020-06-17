@@ -15,7 +15,7 @@ module Annealing
     end
 
     def simulator
-      Simulator.new(temperature: 10_000, cooling_rate: 0.003)
+      Simulator.new(temperature: 10_000, cooling_rate: 0.1)
     end
 
     def test_run

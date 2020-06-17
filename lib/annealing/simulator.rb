@@ -5,17 +5,18 @@ module Annealing
   class Simulator
     attr_reader :temperature, :cooling_rate
 
-    def initialize(temperature:, cooling_rate: -1.0)
-      @temperature = temperature
-      @cooling_rate = cooling_rate
+    def initialize(temperature: nil, cooling_rate: nil)
+      @temperature = temperature || Annealing.configuration.temperature
+      @cooling_rate = cooling_rate || Annealing.configuration.cooling_rate
 
       raise 'Invalid initial temperature' if temperature.negative?
 
       normalize_cooling_rate
     end
 
-    def run(collection, total_energy: nil)
-      best = current = Pool.new(collection.shuffle, total_energy: total_energy)
+    def run(collection, energy_calculator: nil)
+      best = current = Pool.new(collection.shuffle, energy_calculator: energy_calculator)
+      logger = Annealing.configuration.logger
       logger.debug(" Original: #{current}")
       cool_down do |temp|
         current = current.solution_at(temp)
@@ -26,10 +27,6 @@ module Annealing
     end
 
     private
-
-    def logger
-      @logger ||= Logger.new(STDOUT)
-    end
 
     def cool_down
       (temperature..0).step(cooling_rate).each { |temp| yield temp }

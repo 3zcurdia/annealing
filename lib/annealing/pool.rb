@@ -5,17 +5,13 @@ module Annealing
   class Pool
     attr_reader :collection
 
-    def initialize(collection, total_energy: nil)
+    def initialize(collection, energy_calculator: nil)
       @collection = collection.dup
-      @total_energy = total_energy || lambda do |enumerable|
-        enumerable.each_cons(2).sum do |value_a, value_b|
-          value_a.distance(value_b)
-        end
-      end
+      @energy_calculator = energy_calculator || Annealing.configuration.total_energy_calculator
     end
 
     def energy
-      @energy ||= total_energy.call(collection)
+      @energy ||= energy_calculator.call(collection)
     end
 
     def better_than?(pool)
@@ -38,10 +34,10 @@ module Annealing
 
     private
 
-    attr_reader :total_energy
+    attr_reader :energy_calculator
 
     def next
-      Pool.new(swap_collection, total_energy: total_energy)
+      Pool.new(swap_collection, energy_calculator: energy_calculator)
     end
 
     def swap_collection
