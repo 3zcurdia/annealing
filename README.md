@@ -1,4 +1,5 @@
 # Annealing
+[![Gem Version](https://badge.fury.io/rb/annealing.svg)](https://badge.fury.io/rb/annealing)
 
 Find the optimal solution in a complex problem through a simulated annealing implementation for enumerable objects. Where the energy of each object can be measured by a distance method between two elements or a lambda function where the total energy is calculated in the objects.
 
