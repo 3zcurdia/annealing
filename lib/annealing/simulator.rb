@@ -9,7 +9,7 @@ module Annealing
       @temperature = temperature || Annealing.configuration.temperature
       @cooling_rate = cooling_rate || Annealing.configuration.cooling_rate
 
-      raise 'Invalid initial temperature' if temperature.negative?
+      raise 'Invalid initial temperature' if @temperature.negative?
 
       normalize_cooling_rate
     end
