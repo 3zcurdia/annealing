@@ -7,9 +7,9 @@ class AnnealingTest < Minitest::Test
     refute_nil ::Annealing::VERSION
   end
 
-  def test_delta
+  def test_distance
     vec_a = Location.new(1, 0)
     vec_b = Location.new(1, 3)
-    assert_equal 3, vec_a.delta(vec_b)
+    assert_equal 3, vec_a.distance(vec_b)
   end
 end

@@ -20,7 +20,7 @@ module Annealing
 
     def test_run
       simulation = simulator.run(collection)
-      assert simulation.delta < 355
+      assert simulation.energy < 355
     end
   end
 end

@@ -12,7 +12,7 @@ class Location
     "(#{x},#{y})"
   end
 
-  def delta(location)
+  def distance(location)
     dx = (x - location.x).abs
     dy = (y - location.y).abs
     Math.sqrt(dx**2 + dy**2)
