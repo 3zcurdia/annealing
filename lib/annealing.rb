@@ -29,4 +29,8 @@ module Annealing
     simulator = Simulator.new
     simulator.run(collection).collection
   end
+
+  def self.logger
+    configuration.logger
+  end
 end

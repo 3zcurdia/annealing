@@ -16,13 +16,12 @@ module Annealing
 
     def run(collection, energy_calculator: nil)
       best = current = Pool.new(collection.shuffle, energy_calculator: energy_calculator)
-      logger = Annealing.configuration.logger
-      logger.debug(" Original: #{current}")
+      Annealing.logger.debug(" Original: #{current}")
       cool_down do |temp|
         current = current.solution_at(temp)
         best = current if current.better_than?(best)
       end
-      logger.debug("Optimized: #{best}")
+      Annealing.logger.debug("Optimized: #{best}")
       best
     end
 
