@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
-class Location
-  attr_accessor :x, :y
-
-  def initialize(pos_x, pos_y)
-    @x = pos_x
-    @y = pos_y
-  end
-
+Location = Struct.new(:x, :y) do
   def inspect
     "(#{x},#{y})"
   end
