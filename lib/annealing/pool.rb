@@ -32,13 +32,13 @@ module Annealing
       format('%<energy>.4f:%<value>s', energy: energy, value: collection)
     end
 
-    private
-
-    attr_reader :energy_calculator
-
     def next
       Pool.new(swap_collection, energy_calculator: energy_calculator)
     end
+
+    private
+
+    attr_reader :energy_calculator
 
     def swap_collection
       swapped = collection.dup
