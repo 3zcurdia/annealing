@@ -10,6 +10,6 @@ class AnnealingTest < Minitest::Test
   def test_distance
     vec_a = Location.new(1, 0)
     vec_b = Location.new(1, 3)
-    assert_equal 3, vec_a.distance(vec_b)
+    assert_equal 9, vec_a.distance(vec_b)
   end
 end

@@ -15,12 +15,12 @@ module Annealing
     end
 
     def simulator
-      Simulator.new(temperature: 10_000, cooling_rate: 0.1)
+      Simulator.new(temperature: 10_000, cooling_rate: 0.05)
     end
 
     def test_run
       simulation = simulator.run(collection)
-      assert simulation.energy < 355
+      assert simulation.energy < 33_000
     end
 
     def calc_lambda
