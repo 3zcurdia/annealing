@@ -98,7 +98,7 @@ or in the simulator as a parameter
 calc = lambda do |enumerable|
   enumerable.each_cons(2).sum { |a, b| a.distance(b) }
 end
-solution = simulator.run(locations, energy_calculator: calc).collection
+solution = simulator.run(locations, calc).collection
 [(20,40), (40,120), (100,120), (60,200), (180,200)]
 ```
 

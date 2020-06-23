@@ -5,7 +5,7 @@ module Annealing
   class Pool
     attr_reader :collection
 
-    def initialize(collection, energy_calculator: nil)
+    def initialize(collection, energy_calculator = nil)
       @collection = collection.dup
       @energy_calculator = energy_calculator || Annealing.configuration.total_energy_calculator
     end
@@ -33,7 +33,7 @@ module Annealing
     end
 
     def next
-      Pool.new(swap_collection, energy_calculator: energy_calculator)
+      Pool.new(swap_collection, energy_calculator)
     end
 
     private

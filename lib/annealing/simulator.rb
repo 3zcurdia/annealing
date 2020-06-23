@@ -14,8 +14,8 @@ module Annealing
       normalize_cooling_rate
     end
 
-    def run(collection, energy_calculator: nil)
-      best = current = Pool.new(collection.shuffle, energy_calculator: energy_calculator)
+    def run(collection, calculator = nil)
+      best = current = Pool.new(collection.shuffle, calculator)
       Annealing.logger.debug(" Original: #{current}")
       cool_down do |temp|
         current = current.solution_at(temp)

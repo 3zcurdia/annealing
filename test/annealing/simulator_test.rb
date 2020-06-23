@@ -29,7 +29,7 @@ module Annealing
 
     def test_run_with_custom_calc
       arr = (1..10).to_a.shuffle
-      simulation = simulator.run(arr, energy_calculator: calc_lambda)
+      simulation = simulator.run(arr, calc_lambda)
       assert simulation.energy <= 22
     end
   end
