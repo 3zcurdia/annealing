@@ -22,5 +22,15 @@ module Annealing
       simulation = simulator.run(collection)
       assert simulation.energy < 355
     end
+
+    def calc_lambda
+      ->(c) { c.each_with_index.sum { |x, i| 2**(x - i) } }
+    end
+
+    def test_run_with_custom_calc
+      arr = (1..10).to_a.shuffle
+      simulation = simulator.run(arr, energy_calculator: calc_lambda)
+      assert simulation.energy <= 22
+    end
   end
 end
