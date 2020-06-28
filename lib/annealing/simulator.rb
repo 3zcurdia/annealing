@@ -15,14 +15,14 @@ module Annealing
     end
 
     def run(collection, calculator = nil)
-      best = current = Pool.new(collection.shuffle, calculator)
+      current = Metal.new(collection.shuffle, calculator)
       Annealing.logger.debug(" Original: #{current}")
       cool_down do |temp|
-        current = current.solution_at(temp)
-        best = current if current.better_than?(best)
+        current = current.cooled(temp)
+        # best = current if current.better_than?(best)
       end
-      Annealing.logger.debug("Optimized: #{best}")
-      best
+      Annealing.logger.debug("Optimized: #{current}")
+      current
     end
 
     private

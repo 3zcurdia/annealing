@@ -3,7 +3,7 @@
 require 'logger'
 require 'annealing/version'
 require 'annealing/configuration'
-require 'annealing/pool'
+require 'annealing/metal'
 require 'annealing/simulator'
 
 # Simulated Annealing algoritm

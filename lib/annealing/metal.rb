@@ -2,7 +2,7 @@
 
 module Annealing
   # It manages the total energy of a given collection
-  class Pool
+  class Metal
     attr_reader :collection
 
     def initialize(collection, energy_calculator = nil)
@@ -14,15 +14,11 @@ module Annealing
       @energy ||= energy_calculator.call(collection)
     end
 
-    def better_than?(pool)
-      energy < pool.energy
-    end
-
-    def solution_at(temperature)
-      move = self.next
-      energy_delta = energy - move.energy
+    def cooled(temperature)
+      cooled_metal = self.cool
+      energy_delta = energy - cooled_metal.energy
       if energy_delta.positive? || (Math::E**(energy_delta / temperature)) > rand
-        move
+        cooled_metal
       else
         self
       end
@@ -32,8 +28,8 @@ module Annealing
       format('%<energy>.4f:%<value>s', energy: energy, value: collection)
     end
 
-    def next
-      Pool.new(swap_collection, energy_calculator)
+    def cool
+      Metal.new(swap_collection, energy_calculator)
     end
 
     private
