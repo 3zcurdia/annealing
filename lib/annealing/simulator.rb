@@ -19,7 +19,6 @@ module Annealing
       Annealing.logger.debug(" Original: #{current}")
       cool_down do |temp|
         current = current.cooled(temp)
-        # best = current if current.better_than?(best)
       end
       Annealing.logger.debug("Optimized: #{current}")
       current
