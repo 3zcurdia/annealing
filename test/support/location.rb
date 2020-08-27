@@ -6,8 +6,8 @@ Location = Struct.new(:x, :y) do
   end
 
   def distance(location)
-    dx = (x - location.x).abs
-    dy = (y - location.y).abs
-    ((dx * dx) + (dy * dy)).to_i
+    dx = x - location.x
+    dy = y - location.y
+    (dx * dx) + (dy * dy)
   end
 end
