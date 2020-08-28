@@ -16,12 +16,16 @@ module Annealing
 
     def cooled(temperature)
       cooled_metal = self.cool
-      energy_delta = energy - cooled_metal.energy
-      if energy_delta.positive? || (Math::E**(energy_delta / temperature)) > rand
+      if better_than?(cooled_metal)
         cooled_metal
       else
         self
       end
+    end
+
+    def better_than?(metal, temperature)
+      energy_delta = energy - metal.energy
+      energy_delta.positive? || (Math::E**(energy_delta / temperature)) > rand
     end
 
     def to_s
