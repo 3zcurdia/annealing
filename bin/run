@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'annealing'
+
+Location = Struct.new(:x, :y) do
+  def inspect
+    "(#{x},#{y})"
+  end
+
+  def distance(location)
+    dx = x - location.x
+    dy = y - location.y
+    (dx * dx) + (dy * dy)
+  end
+end
+
+simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
+collection = [
+  Location.new(60, 200),
+  Location.new(180, 200),
+  Location.new(40, 120),
+  Location.new(100, 120),
+  Location.new(20, 40)
+]
+result = simulator.run(collection)
+
+puts result.energy
+puts result.collection
