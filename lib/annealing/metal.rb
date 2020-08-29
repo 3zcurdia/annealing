@@ -16,7 +16,7 @@ module Annealing
 
     def cooled(temperature)
       cooled_metal = self.cool
-      if better_than?(cooled_metal)
+      if better_than?(cooled_metal, temperature)
         cooled_metal
       else
         self
