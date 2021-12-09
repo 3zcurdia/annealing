@@ -27,5 +27,9 @@ describe Annealing::Configuration do
     it 'does not set a default state change function' do
       assert_nil configuration.state_change
     end
+
+    it 'does not set a default termination condition' do
+      assert_nil configuration.termination_condition
+    end
   end
 end

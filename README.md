@@ -54,7 +54,7 @@ locations = [
 Next we need a way to calculate the total energy of traveling to each location in turn. Think of it as a representation of the efficiency of the trip; the further away one point is away from the next, the less efficient the trip is.
 
 ```ruby
-energy_calculator = -> (locations) do
+energy_calculator = lambda do |locations|
   locations.each_cons(2).sum do |location1, location2|
     location1.distance(location2)
   end
@@ -64,7 +64,7 @@ end
 Finally, we need a way to make small, random changes the order of the locations the salesperson will visit as we probe for the most efficient route.
 
 ```ruby
-state_change = -> (locations) do
+state_change = lambda do |locations|
   size = locations.size
   swapped = locations.dup
   idx_a = rand(size)
@@ -85,15 +85,14 @@ solution.state
 # => [(20,40), (40,120), (100,120), (60,200), (180,200)]
 ```
 
+### Using custom temperature and cooling settings
+
 If you want to iterate with other parameters you can send the parameters `temperature` and `cooling_rate`.
 
 ```ruby
 simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.5)
-solution = simulator.run(locations,
-                         energy_calculator: energy_calculator,
-                         state_change: state_change)
-solution.energy
-# => 351.901234
+solution = simulator.run(locations, energy_calculator: energy_calculator,
+                                    state_change: state_change)
 solution.state
 # => [(20,40), (40,120), (100,120), (60,200), (180,200)]
 ```
@@ -106,19 +105,8 @@ You can set default parameters that will be used in every simulation. For instan
 Annealing.configure do |c|
   c.temperature  = 10_000
   c.cooling_rate = 0.5
-  c.energy_calculator = -> (locations) do
-    locations.each_cons(2).sum do |location1, location2|
-      location1.distance(location2)
-    end
-  end
-  c.state_change = -> (locations) do
-    size = locations.size
-    swapped = locations.dup
-    idx_a = rand(size)
-    idx_b = rand(size)
-    swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
-    swapped
-  end
+  c.energy_calculator = energy_calculator
+  c.state_change = state_change
 end
 
 solution = Annealing.simulate(locations)
@@ -159,9 +147,26 @@ simulator = Annealing::Simulator.new
 solution = simulator.run(locations, energy_calculator: calculator.method(:energy))
 ```
 
+### Setting a simulation termination condition
+
+Typically, annealing simulators are tasked with finding "close enough" solutions to complex problems by continuously comparing new permutations of an object against one other as the temperature slowly drops to 0 and then returning the lowest energy configuration it found. However, sometimes "close enough" can be determined by other factors as well. For this reason, you might specify a termination condition that will stop the annealing process as soon as the "good enough" condition is met regardless of the current temperature.
+
+Like `energy_calculator` and `state_change`, the `termination_condition` can be any object that responds to `#call` and it can be set globally or per simulation. It should accept three arguments: the current `state` of the object, the `energy` calculation of the current object, and the current `temperature` of the annealer.
+
+```ruby
+# Stop as soon as we find any 0-energy state
+termination_condition = lambda do |state, energy, temperature|
+  energy == 0
+end
+
+simulator = Annealing::Simulator.new
+solution = simulator.run(some_collection, termination_condition: termination_condition)
+solution.state
+```
+
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the test suite. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
