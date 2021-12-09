@@ -12,4 +12,12 @@ end
 
 RuboCop::RakeTask.new(:rubocop)
 
-task default: %i[test rubocop]
+desc 'Execute the end-to-end integration test script'
+task :end_to_end_test do
+  puts
+  puts 'Running full end-to-end test with bin/run'
+  puts `bin/run`
+  puts
+end
+
+task default: %i[test end_to_end_test rubocop]

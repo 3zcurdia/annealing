@@ -6,10 +6,10 @@ module Annealing
     attr_reader :temperature, :cooling_rate
 
     def initialize(temperature: nil, cooling_rate: nil)
-      @temperature = temperature || Annealing.configuration.temperature
-      @cooling_rate = cooling_rate || Annealing.configuration.cooling_rate
+      @temperature = (temperature || default_temperature).to_f
+      @cooling_rate = (cooling_rate || default_cooling_rate).to_f
 
-      raise 'Invalid initial temperature' if @temperature.negative?
+      raise(ArgumentError, 'Invalid initial temperature') if @temperature.negative?
 
       normalize_cooling_rate
     end
@@ -18,7 +18,7 @@ module Annealing
       current = Metal.new(initial_state,
                           energy_calculator: energy_calculator,
                           state_change: state_change)
-      Annealing.logger.debug(" Original: #{current}")
+      Annealing.logger.debug("Original: #{current}")
       cool_down do |temp|
         current = current.cooled(temp)
       end
@@ -34,6 +34,14 @@ module Annealing
 
     def normalize_cooling_rate
       @cooling_rate = -1.0 * cooling_rate if cooling_rate.positive?
+    end
+
+    def default_temperature
+      Annealing.configuration.temperature
+    end
+
+    def default_cooling_rate
+      Annealing.configuration.cooling_rate
     end
   end
 end
