@@ -2,14 +2,50 @@
 
 require 'test_helper'
 
-class AnnealingTest < Minitest::Test
-  def test_that_it_has_a_version_number
+describe Annealing do
+  it 'has a version number' do
     refute_nil ::Annealing::VERSION
   end
 
-  def test_distance
-    vec_a = Location.new(1, 0)
-    vec_b = Location.new(1, 3)
-    assert_equal 9, vec_a.distance(vec_b)
+  describe '.configuration' do
+    it 'returns an instance of Annealing::Configuration' do
+      assert_instance_of Annealing::Configuration, Annealing.configuration
+    end
+  end
+
+  describe '.simulate' do
+    let(:custom_temperature) { 1000 }
+    let(:custom_cooling_rate) { 1 }
+    let(:total_iterations) { custom_temperature / custom_cooling_rate }
+    let(:collection) { (1..10).to_a.shuffle }
+
+    it 'returns the annealed state using the default config' do
+      global_energy_calculator = MiniTest::Mock.new
+      global_state_changer = MiniTest::Mock.new
+      (total_iterations + 1).times do
+        global_energy_calculator.expect(:call, 42, [collection])
+        global_state_changer.expect(:call, collection, [collection])
+      end
+      global_energy_calculator.expect(:call, 42, [collection])
+
+      Annealing.configure do |config|
+        config.temperature = custom_temperature
+        config.cooling_rate = custom_cooling_rate
+        config.energy_calculator = global_energy_calculator
+        config.state_change = global_state_changer
+      end
+
+      Annealing.simulate(collection)
+      global_energy_calculator.verify
+      global_state_changer.verify
+    end
+  end
+
+  describe '.logger' do
+    it 'returns the configuration logger' do
+      logger = Logger.new($stdout)
+      Annealing.configure { |config| config.logger = logger }
+      assert_same logger, Annealing.logger
+    end
   end
 end

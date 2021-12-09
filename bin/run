@@ -39,6 +39,7 @@ state_change = lambda do |state|
   swapped
 end
 
+Annealing.configuration.logger.level = Logger::DEBUG
 simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
 solution = simulator.run(locations,
                          energy_calculator: energy_calculator,

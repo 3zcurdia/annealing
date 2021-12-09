@@ -2,12 +2,15 @@
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'annealing'
-require 'support/location'
 require 'minitest/autorun'
 require 'ruby-prof'
 
 module Minitest
   class Test
+    def teardown
+      Annealing.configuration.reset
+    end
+
     def profile
       RubyProf.start
       yield

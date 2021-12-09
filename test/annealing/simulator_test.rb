@@ -3,35 +3,12 @@
 require 'test_helper'
 
 describe Annealing::Simulator do
-  let(:simulator) do
-    Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
-  end
-  let(:locations) do
-    [
-      Location.new(3, 3),
-      Location.new(1, 1),
-      Location.new(4, 4),
-      Location.new(5, 5),
-      Location.new(2, 2)
-    ]
-  end
+  let(:simulator) { Annealing::Simulator.new }
   let(:default_energy_calculator) do
-    lambda do |locations|
-      locations.each_cons(2).sum do |location1, location2|
-        location1.distance(location2)
-      end
-    end
+    ->(collection) { collection.each_with_index.sum { |n, i| Math.exp(i) * n } }
   end
-  let(:default_state_change) do
-    lambda do |locations|
-      size = locations.size
-      swapped = locations.dup
-      idx_a = rand(size)
-      idx_b = rand(size)
-      swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
-      swapped
-    end
-  end
+  let(:default_state_change) { ->(collection) { collection.shuffle } }
+  let(:collection) { (1..100).to_a.shuffle }
 
   before do
     Annealing.configure do |config|
@@ -40,25 +17,78 @@ describe Annealing::Simulator do
     end
   end
 
-  after do
-    Annealing.configuration.reset
+  describe '.new' do
+    let(:custom_temperature) { 9_999 }
+    let(:custom_cooling_rate) { 1 }
+
+    it 'forces temperature to float' do
+      refute_kind_of Float, custom_temperature
+      simulator = Annealing::Simulator.new(temperature: custom_temperature)
+      assert_kind_of Float, simulator.temperature
+    end
+
+    it 'forces cooling_rate to float' do
+      refute_kind_of Float, custom_cooling_rate
+      simulator = Annealing::Simulator.new(cooling_rate: custom_cooling_rate)
+      assert_kind_of Float, simulator.cooling_rate
+    end
+
+    it 'raises an error if the temperature is negative' do
+      assert_raises(ArgumentError, 'Invalid initial temperature') do
+        Annealing::Simulator.new(temperature: custom_temperature * -1)
+      end
+    end
   end
 
-  it 'uses the global energy calculator and state change method' do
-    initial_energy = default_energy_calculator.call(locations)
-    assert_equal 46, initial_energy
-    simulation = simulator.run(locations)
-    assert_operator simulation.energy, :<, initial_energy
-  end
+  describe '#run' do
+    let(:custom_temperature) { 1000 }
+    let(:custom_cooling_rate) { 1 }
+    let(:total_iterations) { custom_temperature / custom_cooling_rate }
 
-  it 'can override the global energy calculator and state change method' do
-    initial_state = rand * 16
-    local_energy_calculator = ->(state) { (state**2) - 16 }
-    local_state_change = ->(state) { state + (rand - 0.5) }
-    initial_energy = local_energy_calculator.call(initial_state)
-    simulation = simulator.run(initial_state,
-                               energy_calculator: local_energy_calculator,
-                               state_change: local_state_change)
-    assert_operator simulation.energy, :<, initial_energy
+    it 'uses the global energy calculator and state change method' do
+      global_energy_calculator = MiniTest::Mock.new
+      global_state_changer = MiniTest::Mock.new
+      (total_iterations + 1).times do
+        global_energy_calculator.expect(:call, 42, [collection])
+        global_state_changer.expect(:call, collection, [collection])
+      end
+      global_energy_calculator.expect(:call, 42, [collection])
+
+      Annealing.configure do |config|
+        config.temperature = custom_temperature
+        config.cooling_rate = custom_cooling_rate
+        config.energy_calculator = global_energy_calculator
+        config.state_change = global_state_changer
+      end
+
+      simulator.run(collection)
+      global_energy_calculator.verify
+      global_state_changer.verify
+    end
+
+    it 'can override the global energy calculator and state change method' do
+      global_energy_calculator = MiniTest::Mock.new
+      global_state_changer = MiniTest::Mock.new
+
+      local_energy_calculator = MiniTest::Mock.new
+      local_state_changer = MiniTest::Mock.new
+      (total_iterations + 1).times do
+        local_energy_calculator.expect(:call, 42, [collection])
+        local_state_changer.expect(:call, collection, [collection])
+      end
+      local_energy_calculator.expect(:call, 42, [collection])
+
+      Annealing.configure do |config|
+        config.temperature = custom_temperature
+        config.cooling_rate = custom_cooling_rate
+        config.energy_calculator = global_energy_calculator
+        config.state_change = global_state_changer
+      end
+
+      simulator.run(collection, energy_calculator: local_energy_calculator,
+                                state_change: local_state_changer)
+      local_energy_calculator.verify
+      local_state_changer.verify
+    end
   end
 end

@@ -39,14 +39,14 @@ module Annealing
       format('%<energy>.4f:%<value>s', energy: energy, value: state)
     end
 
+    private
+
+    attr_reader :energy_calculator, :state_change
+
     def cool
       Metal.new(next_state, energy_calculator: energy_calculator,
                             state_change: state_change)
     end
-
-    private
-
-    attr_reader :energy_calculator, :state_change
 
     def next_state
       state_change.call(state)
