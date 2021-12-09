@@ -28,8 +28,8 @@ module Annealing
 
     private
 
-    def cool_down
-      (temperature..0).step(cooling_rate).each { |temp| yield temp }
+    def cool_down(&block)
+      (temperature..0).step(cooling_rate).each(&block)
     end
 
     def normalize_cooling_rate

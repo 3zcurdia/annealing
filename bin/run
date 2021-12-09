@@ -12,7 +12,7 @@ Location = Struct.new(:name, :x, :y) do
   def distance(location)
     dx = (x - location.x).abs
     dy = (y - location.y).abs
-    Math.sqrt(dx**2 + dy**2)
+    Math.sqrt((dx**2) + (dy**2))
   end
 end
 
@@ -24,15 +24,15 @@ locations = [
   Location.new('Allentown', 20, 40)
 ].shuffle
 
-energy_calculator = -> (locations) do
-  locations.each_cons(2).sum do |location1, location2|
+energy_calculator = lambda do |state|
+  state.each_cons(2).sum do |location1, location2|
     location1.distance(location2)
   end
 end
 
-state_change = -> (locations) do
-  size = locations.size
-  swapped = locations.dup
+state_change = lambda do |state|
+  size = state.size
+  swapped = state.dup
   idx_a = rand(size)
   idx_b = rand(size)
   swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]

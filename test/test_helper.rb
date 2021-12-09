@@ -6,13 +6,14 @@ require 'support/location'
 require 'minitest/autorun'
 require 'ruby-prof'
 
-class Minitest::Test
-
-  def profile
+module Minitest
+  class Test
+    def profile
       RubyProf.start
       yield
       result = RubyProf.stop
       printer = RubyProf::FlatPrinter.new(result)
-      printer.print(STDOUT)
+      printer.print($stdout)
+    end
   end
 end
