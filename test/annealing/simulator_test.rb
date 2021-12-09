@@ -2,58 +2,63 @@
 
 require 'test_helper'
 
-module Annealing
-  class SimulatorTest < Minitest::Test
-    def setup
-      @locations = [
-        Location.new(3, 3),
-        Location.new(1, 1),
-        Location.new(4, 4),
-        Location.new(5, 5),
-        Location.new(2, 2)
-      ]
-
-      @energy_calculator = -> (locations) do
-        locations.each_cons(2).sum do |location1, location2|
-          location1.distance(location2)
-        end
+describe Annealing::Simulator do
+  let(:simulator) do
+    Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
+  end
+  let(:locations) do
+    [
+      Location.new(3, 3),
+      Location.new(1, 1),
+      Location.new(4, 4),
+      Location.new(5, 5),
+      Location.new(2, 2)
+    ]
+  end
+  let(:default_energy_calculator) do
+    -> (locations) do
+      locations.each_cons(2).sum do |location1, location2|
+        location1.distance(location2)
       end
-
-      Annealing.configure do |config|
-        config.energy_calculator = @energy_calculator
-        config.state_change = -> (locations) do
-          size = locations.size
-          swapped = locations.dup
-          idx_a = rand(size)
-          idx_b = rand(size)
-          swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
-          swapped
-        end
-      end
-
-      @simulator = Simulator.new(temperature: 10_000, cooling_rate: 0.01)
     end
-
-    def teardown
-      Annealing.configuration.reset
+  end
+  let(:default_state_change) do
+    -> (locations) do
+      size = locations.size
+      swapped = locations.dup
+      idx_a = rand(size)
+      idx_b = rand(size)
+      swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
+      swapped
     end
+  end
 
-    def test_run
-      initial_energy = @energy_calculator.call(@locations)
-      assert_equal 46, initial_energy
-      simulation = @simulator.run(@locations)
-      assert_operator simulation.energy, :<, initial_energy
+  before do
+    Annealing.configure do |config|
+      config.energy_calculator = default_energy_calculator
+      config.state_change = default_state_change
     end
+  end
 
-    def test_run_with_calc_and_move_override
-      initial_state = rand * 16
-      energy_calculator = -> (state) { state * state - 16 }
-      state_change = -> (state) { state + (rand - 0.5) }
-      initial_energy = energy_calculator.call(initial_state)
-      simulation = @simulator.run(initial_state,
-                                  energy_calculator: energy_calculator,
-                                  state_change: state_change)
-      assert_operator simulation.energy, :<, initial_energy
-    end
+  after do
+    Annealing.configuration.reset
+  end
+
+  it "uses the global energy calculator and state change method" do
+    initial_energy = default_energy_calculator.call(locations)
+    assert_equal 46, initial_energy
+    simulation = simulator.run(locations)
+    assert_operator simulation.energy, :<, initial_energy
+  end
+
+  it "can override the global energy calculator and state change method" do
+    initial_state = rand * 16
+    local_energy_calculator = -> (state) { state * state - 16 }
+    local_state_change = -> (state) { state + (rand - 0.5) }
+    initial_energy = local_energy_calculator.call(initial_state)
+    simulation = simulator.run(initial_state,
+                                energy_calculator: local_energy_calculator,
+                                state_change: local_state_change)
+    assert_operator simulation.energy, :<, initial_energy
   end
 end
