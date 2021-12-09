@@ -29,5 +29,9 @@ module Annealing
     def test_does_not_set_a_default_state_change_function
       assert_nil @configuration.state_change
     end
+
+    def test_does_not_set_a_default_termination_condition
+      assert_nil @configuration.termination_condition
+    end
   end
 end

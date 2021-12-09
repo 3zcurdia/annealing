@@ -4,7 +4,7 @@ module Annealing
   # It enables the gem configuration
   class Configuration
     attr_accessor :temperature, :cooling_rate, :logger,
-                  :energy_calculator, :state_change
+                  :energy_calculator, :state_change, :termination_condition
 
     def initialize
       reset
@@ -16,6 +16,7 @@ module Annealing
       @logger = Logger.new($stdout, level: Logger::INFO)
       @energy_calculator = nil
       @state_change = nil
+      @termination_condition = nil
     end
   end
 end
