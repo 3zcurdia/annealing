@@ -4,27 +4,54 @@
 require 'bundler/setup'
 require 'annealing'
 
-Location = Struct.new(:x, :y) do
+Location = Struct.new(:name, :x, :y) do
   def inspect
-    "(#{x},#{y})"
+    "#{name} (#{x},#{y})"
   end
 
   def distance(location)
-    dx = x - location.x
-    dy = y - location.y
-    (dx * dx) + (dy * dy)
+    dx = (x - location.x).abs
+    dy = (y - location.y).abs
+    Math.sqrt(dx**2 + dy**2)
   end
 end
 
-simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
-collection = [
-  Location.new(60, 200),
-  Location.new(180, 200),
-  Location.new(40, 120),
-  Location.new(100, 120),
-  Location.new(20, 40)
-]
-result = simulator.run(collection)
+locations = [
+  Location.new('Blaire Hills', 60, 200),
+  Location.new('Smallville', 180, 200),
+  Location.new('Boggs Harbor', 40, 120),
+  Location.new('Curtisville', 100, 120),
+  Location.new('Allentown', 20, 40)
+].shuffle
 
-puts result.energy
-puts result.collection
+energy_calculator = -> (locations) do
+  locations.each_cons(2).sum do |location1, location2|
+    location1.distance(location2)
+  end
+end
+
+state_change = -> (locations) do
+  size = locations.size
+  swapped = locations.dup
+  idx_a = rand(size)
+  idx_b = rand(size)
+  swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
+  swapped
+end
+
+simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
+solution = simulator.run(locations,
+                         energy_calculator: energy_calculator,
+                         state_change: state_change)
+
+puts "\nInitial itinerary:"
+locations.each_cons(2).each_with_index do |(location1, location2), index|
+  puts "Stop ##{index + 1}: #{location1.name} -> #{location2.name} (#{location1.distance(location2)})"
+end
+puts "-------\nEnergy: #{energy_calculator.call(locations)}"
+
+puts "\nAnnealed itinerary:"
+solution.state.each_cons(2).each_with_index do |(location1, location2), index|
+  puts "Stop ##{index + 1}: #{location1.name} -> #{location2.name} (#{location1.distance(location2)})"
+end
+puts "-------\nEnergy: #{solution.energy}"
