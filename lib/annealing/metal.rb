@@ -3,15 +3,28 @@
 module Annealing
   # It manages the total energy of a given collection
   class Metal
-    attr_reader :collection
+    attr_reader :state
 
-    def initialize(collection, energy_calculator = nil)
-      @collection = collection.dup
-      @energy_calculator = energy_calculator || Annealing.configuration.total_energy_calculator
+    def initialize(state, energy_calculator: nil, state_change: nil)
+      @state = state
+
+      @energy_calculator = energy_calculator ||
+        Annealing.configuration.energy_calculator
+      raise(
+        ArgumentError,
+        "Missing energy calculator function"
+      ) unless @energy_calculator.respond_to?(:call)
+
+      @state_change = state_change ||
+        Annealing.configuration.state_change
+      raise(
+        ArgumentError,
+        "Missing state change function"
+      ) unless @state_change.respond_to?(:call)
     end
 
     def energy
-      @energy ||= energy_calculator.call(collection)
+      @energy ||= energy_calculator.call(state)
     end
 
     def cooled(temperature)
@@ -23,33 +36,26 @@ module Annealing
       end
     end
 
-    def better_than?(metal, temperature)
-      energy_delta = energy - metal.energy
+    def better_than?(cooled_metal, temperature)
+      energy_delta = energy - cooled_metal.energy
       energy_delta.positive? || (Math::E**(energy_delta / temperature)) > rand
     end
 
     def to_s
-      format('%<energy>.4f:%<value>s', energy: energy, value: collection)
+      format('%<energy>.4f:%<value>s', energy: energy, value: state)
     end
 
     def cool
-      Metal.new(swap_collection, energy_calculator)
+      Metal.new(next_state, energy_calculator: energy_calculator,
+                            state_change: state_change)
     end
 
     private
 
-    attr_reader :energy_calculator
+    attr_reader :energy_calculator, :state_change
 
-    def swap_collection
-      swapped = collection.dup
-      idx_a = rand(size)
-      idx_b = rand(size)
-      swapped[idx_b], swapped[idx_a] = swapped[idx_a], swapped[idx_b]
-      swapped
-    end
-
-    def size
-      collection.size
+    def next_state
+      state_change.call(state)
     end
   end
 end

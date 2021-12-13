@@ -23,11 +23,9 @@ module Annealing
     yield(configuration)
   end
 
-  def self.simulate(collection)
-    return [] if collection.empty?
-
+  def self.simulate(initial_state)
     simulator = Simulator.new
-    simulator.run(collection).collection
+    simulator.run(initial_state).state
   end
 
   def self.logger

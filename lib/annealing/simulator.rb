@@ -14,8 +14,10 @@ module Annealing
       normalize_cooling_rate
     end
 
-    def run(collection, calculator = nil)
-      current = Metal.new(collection.shuffle, calculator)
+    def run(initial_state, energy_calculator: nil, state_change: nil)
+      current = Metal.new(initial_state,
+                          energy_calculator: energy_calculator,
+                          state_change: state_change)
       Annealing.logger.debug(" Original: #{current}")
       cool_down do |temp|
         current = current.cooled(temp)
