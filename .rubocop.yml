@@ -19,8 +19,11 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   IgnoredMethods: ['describe', 'context']
 
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/MethodLength:
-  Max: 15
+  Max: 25
 
 Lint/RaiseException:
   Enabled: true
