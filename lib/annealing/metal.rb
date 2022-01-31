@@ -7,20 +7,14 @@ module Annealing
 
     def initialize(state, energy_calculator: nil, state_change: nil)
       @state = state
-
       @energy_calculator = energy_calculator ||
-        Annealing.configuration.energy_calculator
-      raise(
-        ArgumentError,
-        "Missing energy calculator function"
-      ) unless @energy_calculator.respond_to?(:call)
-
+                           Annealing.configuration.energy_calculator
       @state_change = state_change ||
-        Annealing.configuration.state_change
-      raise(
-        ArgumentError,
-        "Missing state change function"
-      ) unless @state_change.respond_to?(:call)
+                      Annealing.configuration.state_change
+
+      raise(ArgumentError, 'Missing energy calculator function') unless @energy_calculator.respond_to?(:call)
+
+      raise(ArgumentError, 'Missing state change function') unless @state_change.respond_to?(:call)
     end
 
     def energy
@@ -28,7 +22,7 @@ module Annealing
     end
 
     def cooled(temperature)
-      cooled_metal = self.cool
+      cooled_metal = cool
       if better_than?(cooled_metal, temperature)
         cooled_metal
       else
@@ -45,14 +39,14 @@ module Annealing
       format('%<energy>.4f:%<value>s', energy: energy, value: state)
     end
 
+    private
+
+    attr_reader :energy_calculator, :state_change
+
     def cool
       Metal.new(next_state, energy_calculator: energy_calculator,
                             state_change: state_change)
     end
-
-    private
-
-    attr_reader :energy_calculator, :state_change
 
     def next_state
       state_change.call(state)

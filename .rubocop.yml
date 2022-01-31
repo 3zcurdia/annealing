@@ -1,18 +1,29 @@
 inherit_from: .rubocop_todo.yml
 
+require:
+  - rubocop-performance
+  - rubocop-minitest
+  - rubocop-rake
+
+AllCops:
+  DefaultFormatter: progress
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+  NewCops: enable
+  TargetRubyVersion: 2.5
+
 Metrics/AbcSize:
   Max: 25
-Metrics/MethodLength:
-  Max: 15
-Layout/LineLength:
-  Max: 120
-Lint/RaiseException:
-  Enabled: true
-Lint/StructNewOverride:
+
+Metrics/BlockLength:
+  IgnoredMethods: ['describe', 'context']
+
+Metrics/ClassLength:
   Enabled: false
-Style/HashEachMethods:
-  Enabled: true
-Style/HashTransformKeys:
-  Enabled: true
-Style/HashTransformValues:
+
+Metrics/MethodLength:
+  Max: 25
+
+Lint/RaiseException:
   Enabled: true

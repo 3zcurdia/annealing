@@ -13,7 +13,7 @@ module Annealing
     def reset
       @temperature  = 10_000.0
       @cooling_rate = 0.0003
-      @logger = Logger.new(STDOUT)
+      @logger = Logger.new($stdout, level: Logger::INFO)
       @energy_calculator = nil
       @state_change = nil
     end
