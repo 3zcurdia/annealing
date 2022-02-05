@@ -16,15 +16,12 @@ module Annealing
 
     def run(initial_state, energy_calculator: nil, state_change: nil, termination_condition: nil)
       termination_condition ||= default_termination_condition
-
       current = Metal.new(initial_state, @temperature,
                           energy_calculator: energy_calculator,
                           state_change: state_change)
       Annealing.logger.debug("Original: #{current}")
-      cool_down do |temp|
-        break if termination_condition_met?(termination_condition, current, temp)
-
-        current = current.cooled(temp)
+      until termination_condition_met?(termination_condition, current) do
+        current = cool_down(current)
       end
       Annealing.logger.debug("Optimized: #{current}")
       current
@@ -32,18 +29,22 @@ module Annealing
 
     private
 
-    def cool_down(&block)
-      (temperature..0).step(cooling_rate).each(&block)
+    def cool_down(current)
+      # Use addition because cooling rate is negative
+      current.cooled(current.temperature + cooling_rate)
     end
 
     def normalize_cooling_rate
       @cooling_rate = -1.0 * cooling_rate if cooling_rate.positive?
     end
 
-    def termination_condition_met?(termination_condition, metal, temperature)
-      return false unless termination_condition.respond_to?(:call)
-
-      termination_condition.call(metal.state, metal.energy, temperature)
+    def termination_condition_met?(termination_condition, metal)
+      # binding.break if metal.temperature <= 1
+      if termination_condition.respond_to?(:call)
+        termination_condition.call(metal.state, metal.energy, metal.temperature)
+      else
+        metal.temperature <= 0.0
+      end
     end
 
     def default_temperature
