@@ -27,15 +27,21 @@ module Annealing
       assert_kind_of Float, @simulator.temperature
     end
 
-    def test_forces_cooling_rate_to_negative_float
+    def test_forces_cooling_rate_to_float
       refute_kind_of Float, @cooling_rate
-      assert_equal @cooling_rate.to_f * -1, @simulator.cooling_rate
+      assert_equal @cooling_rate.to_f, @simulator.cooling_rate
       assert_kind_of Float, @simulator.cooling_rate
     end
 
     def test_raises_an_error_if_the_temperature_is_negative
       assert_raises(ArgumentError, 'Invalid initial temperature') do
         Annealing::Simulator.new(temperature: @temperature * -1)
+      end
+    end
+
+    def test_raises_an_error_if_the_cooling_rate_is_negative
+      assert_raises(ArgumentError, 'Invalid initial cooling rate') do
+        Annealing::Simulator.new(cooling_rate: @cooling_rate * -1)
       end
     end
 

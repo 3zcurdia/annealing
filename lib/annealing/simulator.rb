@@ -11,7 +11,7 @@ module Annealing
 
       raise(ArgumentError, 'Invalid initial temperature') if @temperature.negative?
 
-      normalize_cooling_rate
+      raise(ArgumentError, 'Invalid initial cooling rate') if @cooling_rate.negative?
     end
 
     def run(initial_state, energy_calculator: nil, state_change: nil, termination_condition: nil)
@@ -30,12 +30,7 @@ module Annealing
     private
 
     def cool_down(current)
-      # Use addition because cooling rate is negative
-      current.cooled(current.temperature + cooling_rate)
-    end
-
-    def normalize_cooling_rate
-      @cooling_rate = -1.0 * cooling_rate if cooling_rate.positive?
+      current.cooled(current.temperature - cooling_rate)
     end
 
     def termination_condition_met?(termination_condition, metal)
