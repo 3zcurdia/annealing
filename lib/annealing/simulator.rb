@@ -17,7 +17,7 @@ module Annealing
     def run(initial_state, energy_calculator: nil, state_change: nil, termination_condition: nil)
       termination_condition ||= default_termination_condition
 
-      current = Metal.new(initial_state,
+      current = Metal.new(initial_state, @temperature,
                           energy_calculator: energy_calculator,
                           state_change: state_change)
       Annealing.logger.debug("Original: #{current}")

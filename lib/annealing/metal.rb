@@ -3,10 +3,11 @@
 module Annealing
   # It manages the total energy of a given collection
   class Metal
-    attr_reader :state
+    attr_reader :state, :temperature
 
-    def initialize(state, energy_calculator: nil, state_change: nil)
+    def initialize(state, temperature, energy_calculator: nil, state_change: nil)
       @state = state
+      @temperature = temperature
       @energy_calculator = energy_calculator ||
                            Annealing.configuration.energy_calculator
       @state_change = state_change ||
@@ -18,38 +19,39 @@ module Annealing
     end
 
     def energy
-      @energy ||= energy_calculator.call(state)
+      @energy ||= @energy_calculator.call(state)
     end
 
-    def cooled(temperature)
-      cooled_metal = cool
-      if better_than?(cooled_metal, temperature)
+    def cooled(new_temperature)
+      cooled_metal = cool(new_temperature)
+      if better_than?(cooled_metal)
         cooled_metal
       else
+        @temperature = new_temperature
         self
       end
     end
 
-    def better_than?(cooled_metal, temperature)
+    def better_than?(cooled_metal)
       energy_delta = energy - cooled_metal.energy
-      energy_delta.positive? || (Math::E**(energy_delta / temperature)) > rand
+      energy_delta.positive? ||
+        (Math::E**(energy_delta / cooled_metal.temperature)) > rand
     end
 
     def to_s
-      format('%<energy>.4f:%<value>s', energy: energy, value: state)
+      format('%<temperature>.4f:%<energy>.4f:%<value>s',
+             temperature: temperature,
+             energy: energy,
+             value: state.inspect)
     end
 
     private
 
-    attr_reader :energy_calculator, :state_change
-
-    def cool
-      Metal.new(next_state, energy_calculator: energy_calculator,
-                            state_change: state_change)
-    end
-
-    def next_state
-      state_change.call(state)
+    def cool(new_temperature)
+      next_state = @state_change.call(state)
+      Metal.new(next_state, new_temperature,
+                energy_calculator: @energy_calculator,
+                state_change: @state_change)
     end
   end
 end
