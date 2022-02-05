@@ -11,3 +11,4 @@ gem 'rubocop', '~> 1.23'
 gem 'rubocop-minitest', '~> 0.17.0'
 gem 'rubocop-performance', '~> 1.12'
 gem 'rubocop-rake', '~> 0.6.0'
+gem 'debug', '>= 1.0.0', require: false
