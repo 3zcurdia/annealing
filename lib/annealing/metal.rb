@@ -8,10 +8,8 @@ module Annealing
     def initialize(state, temperature, energy_calculator: nil, state_change: nil)
       @state = state
       @temperature = temperature
-      @energy_calculator = energy_calculator ||
-                           Annealing.configuration.energy_calculator
-      @state_change = state_change ||
-                      Annealing.configuration.state_change
+      @energy_calculator = energy_calculator || default_energy_calculator
+      @state_change = state_change || default_state_change
 
       raise(ArgumentError, 'Missing energy calculator function') unless @energy_calculator.respond_to?(:call)
 
@@ -52,6 +50,14 @@ module Annealing
       Metal.new(next_state, new_temperature,
                 energy_calculator: @energy_calculator,
                 state_change: @state_change)
+    end
+
+    def default_energy_calculator
+      Annealing.configuration.energy_calculator
+    end
+
+    def default_state_change
+      Annealing.configuration.state_change
     end
   end
 end
