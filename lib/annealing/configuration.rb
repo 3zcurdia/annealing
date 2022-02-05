@@ -3,19 +3,21 @@
 module Annealing
   # It enables the gem configuration
   class Configuration
-    attr_accessor :temperature, :cooling_rate, :logger,
-                  :energy_calculator, :state_change, :termination_condition
+    attr_accessor :cool_down, :cooling_rate, :energy_calculator,
+                  :logger, :state_change, :temperature,
+                  :termination_condition
 
     def initialize
       reset
     end
 
     def reset
-      @temperature  = 10_000.0
+      @cool_down = nil
       @cooling_rate = 0.0003
-      @logger = Logger.new($stdout, level: Logger::INFO)
       @energy_calculator = nil
+      @logger = Logger.new($stdout, level: Logger::INFO)
       @state_change = nil
+      @temperature  = 10_000.0
       @termination_condition = nil
     end
   end
