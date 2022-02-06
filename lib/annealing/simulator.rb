@@ -40,7 +40,7 @@ module Annealing
     def reduce_temperature(cool_down, metal, steps)
       new_temperature = cool_down.call(metal.energy, metal.temperature,
                                        cooling_rate, steps)
-      metal.cooled(new_temperature)
+      metal.cool!(new_temperature)
     end
 
     def termination_condition_met?(termination_condition, metal)
