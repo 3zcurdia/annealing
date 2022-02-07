@@ -54,7 +54,7 @@ module Annealing
 
     def test_raises_an_error_if_termination_condition_not_specified
       Annealing.configuration.termination_condition = nil
-      assert_raises(ArgumentError, 'Missing termination condition function') do
+      assert_raises(ArgumentError, "Missing termination condition function") do
         simulator = Annealing::Simulator.new
         simulator.run(@collection)
       end
