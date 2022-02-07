@@ -6,27 +6,9 @@ require:
   - rubocop-rake
 
 AllCops:
+  TargetRubyVersion: 2.5
+  NewCops: enable
   DefaultFormatter: progress
   DisplayCopNames: true
   DisplayStyleGuide: true
   ExtraDetails: true
-  NewCops: enable
-  TargetRubyVersion: 2.5
-
-Metrics/AbcSize:
-  Max: 25
-
-Metrics/BlockLength:
-  IgnoredMethods: ['describe', 'context']
-
-Metrics/ClassLength:
-  Enabled: false
-
-Metrics/MethodLength:
-  Max: 25
-
-Minitest/MultipleAssertions:
-  Max: 4
-
-Lint/RaiseException:
-  Enabled: true

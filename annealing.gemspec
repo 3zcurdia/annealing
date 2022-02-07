@@ -5,8 +5,8 @@ require_relative 'lib/annealing/version'
 Gem::Specification.new do |spec|
   spec.name          = 'annealing'
   spec.version       = Annealing::VERSION
-  spec.authors       = ['Luis Ezcurdia Razo']
-  spec.email         = ['ing.ezcurdia@gmail.com']
+  spec.authors       = ['Luis Ezcurdia', 'Chris Bloom']
+  spec.email         = ['ing.ezcurdia@gmail.com', 'chrisbloom7@gmail.com']
   spec.license       = 'MIT'
 
   spec.summary       = 'Simulated Annealing algoritm'
@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'ruby-prof', '~> 1.4', '>= 1.4.3'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
