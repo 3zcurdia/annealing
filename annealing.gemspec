@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'ruby-prof', '~> 1.4', '>= 1.4.3'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
