@@ -18,7 +18,7 @@ module Annealing
       cool_down ||= default_cool_down
       termination_condition ||= default_termination_condition
 
-      raise(ArgumentError, 'Missing cool down function') unless cool_down.respond_to?(:call)
+      raise(ArgumentError, "Missing cool down function") unless cool_down.respond_to?(:call)
 
       raise(ArgumentError, 'Missing termination condition function') unless termination_condition.respond_to?(:call)
 
