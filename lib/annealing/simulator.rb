@@ -11,7 +11,7 @@ module Annealing
 
       raise(ArgumentError, "Invalid initial temperature") if @temperature.negative?
 
-      raise(ArgumentError, 'Invalid initial cooling rate') if @cooling_rate.negative?
+      raise(ArgumentError, "Invalid initial cooling rate") if @cooling_rate.negative?
     end
 
     def run(initial_state, cool_down: nil, energy_calculator: nil, state_change: nil, termination_condition: nil)
