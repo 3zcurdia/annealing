@@ -18,7 +18,7 @@ class AnnealingTest < Minitest::Test
     collection = (1..10).to_a.shuffle
     global_energy_calculator = MiniTest::Mock.new
     global_state_changer = MiniTest::Mock.new
-    (total_iterations + 1).times do
+    total_iterations.times do
       global_energy_calculator.expect(:call, 42, [collection])
       global_state_changer.expect(:call, collection, [collection])
     end

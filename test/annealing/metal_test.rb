@@ -44,7 +44,7 @@ module Annealing
     def test_cooled_returns_metal_instance_with_new_temperature
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
-      cooled_metal = metal.cooled(new_temperature)
+      cooled_metal = metal.cool!(new_temperature)
       assert_instance_of Annealing::Metal, cooled_metal
       assert_equal new_temperature, cooled_metal.temperature
     end
@@ -54,7 +54,7 @@ module Annealing
       custom_state_changer.expect(:call, [], [@collection])
       metal = Annealing::Metal.new(@collection, @temperature,
                                    state_change: custom_state_changer)
-      metal.cooled(@temperature)
+      metal.cool!(@temperature)
       custom_state_changer.verify
     end
 
@@ -62,7 +62,7 @@ module Annealing
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:better_than?, true) do
-        metal.cooled(new_temperature)
+        metal.cool!(new_temperature)
       end
       refute_same metal, cooled_metal
       refute_equal new_temperature, metal.temperature
@@ -72,7 +72,7 @@ module Annealing
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:better_than?, false) do
-        metal.cooled(new_temperature)
+        metal.cool!(new_temperature)
       end
       assert_same metal, cooled_metal
       assert_equal new_temperature, metal.temperature
@@ -89,7 +89,7 @@ module Annealing
                                    energy_calculator: custom_calculator)
       cooled_metal = Annealing::Metal.new(changed_collection, @temperature,
                                           energy_calculator: custom_calculator)
-      metal.better_than?(cooled_metal)
+      metal.send(:better_than?, cooled_metal)
       custom_calculator.verify
     end
 
@@ -99,7 +99,7 @@ module Annealing
       cooled_metal = Annealing::Metal.new(@collection.shuffle, @temperature)
       metal.stub(:energy, @current_energy) do
         cooled_metal.stub(:energy, cooled_energy) do
-          assert metal.better_than?(cooled_metal)
+          assert metal.send(:better_than?, cooled_metal)
         end
       end
     end
@@ -112,7 +112,7 @@ module Annealing
       metal.stub(:energy, @current_energy) do
         cooled_metal.stub(:energy, cooled_energy) do
           metal.stub(:rand, probability) do
-            assert metal.better_than?(cooled_metal)
+            assert metal.send(:better_than?, cooled_metal)
           end
         end
       end
@@ -126,7 +126,7 @@ module Annealing
       metal.stub(:energy, @current_energy) do
         cooled_metal.stub(:energy, cooled_energy) do
           metal.stub(:rand, probability) do
-            refute metal.better_than?(cooled_metal)
+            refute metal.send(:better_than?, cooled_metal)
           end
         end
       end

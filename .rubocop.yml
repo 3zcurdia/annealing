@@ -25,5 +25,8 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Max: 25
 
+Minitest/MultipleAssertions:
+  Max: 4
+
 Lint/RaiseException:
   Enabled: true

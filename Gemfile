@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in annealing.gemspec
 gemspec
 
+gem 'debug', '>= 1.0.0', require: false
 gem 'minitest', '~> 5.0'
 gem 'rake', '~> 13.0', '>= 13.0.6'
 gem 'rubocop', '~> 1.23'

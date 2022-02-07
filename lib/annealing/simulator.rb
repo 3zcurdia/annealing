@@ -3,7 +3,7 @@
 module Annealing
   # It runs simulated annealing
   class Simulator
-    attr_reader :temperature, :cooling_rate
+    attr_reader :cooling_rate, :temperature
 
     def initialize(temperature: nil, cooling_rate: nil)
       @temperature = (temperature || default_temperature).to_f
@@ -11,20 +11,25 @@ module Annealing
 
       raise(ArgumentError, 'Invalid initial temperature') if @temperature.negative?
 
-      normalize_cooling_rate
+      raise(ArgumentError, 'Invalid initial cooling rate') if @cooling_rate.negative?
     end
 
-    def run(initial_state, energy_calculator: nil, state_change: nil, termination_condition: nil)
+    def run(initial_state, cool_down: nil, energy_calculator: nil, state_change: nil, termination_condition: nil)
+      cool_down ||= default_cool_down
       termination_condition ||= default_termination_condition
+
+      raise(ArgumentError, 'Missing cool down function') unless cool_down.respond_to?(:call)
+
+      raise(ArgumentError, 'Missing termination condition function') unless termination_condition.respond_to?(:call)
 
       current = Metal.new(initial_state, @temperature,
                           energy_calculator: energy_calculator,
                           state_change: state_change)
       Annealing.logger.debug("Original: #{current}")
-      cool_down do |temp|
-        break if termination_condition_met?(termination_condition, current, temp)
-
-        current = current.cooled(temp)
+      steps = 0
+      until termination_condition_met?(termination_condition, current)
+        steps += 1
+        current = reduce_temperature(cool_down, current, steps)
       end
       Annealing.logger.debug("Optimized: #{current}")
       current
@@ -32,18 +37,14 @@ module Annealing
 
     private
 
-    def cool_down(&block)
-      (temperature..0).step(cooling_rate).each(&block)
+    def reduce_temperature(cool_down, metal, steps)
+      new_temperature = cool_down.call(metal.energy, metal.temperature,
+                                       cooling_rate, steps)
+      metal.cool!(new_temperature)
     end
 
-    def normalize_cooling_rate
-      @cooling_rate = -1.0 * cooling_rate if cooling_rate.positive?
-    end
-
-    def termination_condition_met?(termination_condition, metal, temperature)
-      return false unless termination_condition.respond_to?(:call)
-
-      termination_condition.call(metal.state, metal.energy, temperature)
+    def termination_condition_met?(termination_condition, metal)
+      termination_condition.call(metal.state, metal.energy, metal.temperature)
     end
 
     def default_temperature
@@ -52,6 +53,10 @@ module Annealing
 
     def default_cooling_rate
       Annealing.configuration.cooling_rate
+    end
+
+    def default_cool_down
+      Annealing.configuration.cool_down
     end
 
     def default_termination_condition
