@@ -39,7 +39,7 @@ module Annealing
     end
 
     def test_raises_an_error_if_the_cooling_rate_is_negative
-      assert_raises(ArgumentError, 'Invalid initial cooling rate') do
+      assert_raises(ArgumentError, "Invalid initial cooling rate") do
         Annealing::Simulator.new(cooling_rate: @cooling_rate * -1)
       end
     end
