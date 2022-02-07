@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 module Annealing
   class SimulatorTest < Minitest::Test
@@ -34,7 +34,7 @@ module Annealing
     end
 
     def test_raises_an_error_if_the_temperature_is_negative
-      assert_raises(ArgumentError, 'Invalid initial temperature') do
+      assert_raises(ArgumentError, "Invalid initial temperature") do
         Annealing::Simulator.new(temperature: @temperature * -1)
       end
     end

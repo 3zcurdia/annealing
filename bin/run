@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'bundler/setup'
-require 'annealing'
+require "bundler/setup"
+require "annealing"
 
 Location = Struct.new(:name, :x, :y) do
   def inspect
@@ -17,11 +17,11 @@ Location = Struct.new(:name, :x, :y) do
 end
 
 locations = [
-  Location.new('Blaire Hills', 60, 200),
-  Location.new('Smallville', 180, 200),
-  Location.new('Boggs Harbor', 40, 120),
-  Location.new('Curtisville', 100, 120),
-  Location.new('Allentown', 20, 40)
+  Location.new("Blaire Hills", 60, 200),
+  Location.new("Smallville", 180, 200),
+  Location.new("Boggs Harbor", 40, 120),
+  Location.new("Curtisville", 100, 120),
+  Location.new("Allentown", 20, 40)
 ].shuffle
 
 energy_calculator = lambda do |state|

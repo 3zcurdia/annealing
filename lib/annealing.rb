@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'logger'
-require 'annealing/version'
-require 'annealing/configuration'
-require 'annealing/metal'
-require 'annealing/simulator'
+require "logger"
+require "annealing/version"
+require "annealing/configuration"
+require "annealing/metal"
+require "annealing/simulator"
 
 # Simulated Annealing algoritm
 # https://en.wikipedia.org/wiki/Simulated_annealing
