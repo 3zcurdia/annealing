@@ -46,7 +46,7 @@ module Annealing
 
     def test_raises_an_error_if_cool_down_funtion_not_specified
       Annealing.configuration.cool_down = nil
-      assert_raises(ArgumentError, 'Missing cool down function') do
+      assert_raises(ArgumentError, "Missing cool down function") do
         simulator = Annealing::Simulator.new
         simulator.run(@collection)
       end
