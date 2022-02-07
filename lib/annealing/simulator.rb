@@ -20,7 +20,7 @@ module Annealing
 
       raise(ArgumentError, "Missing cool down function") unless cool_down.respond_to?(:call)
 
-      raise(ArgumentError, 'Missing termination condition function') unless termination_condition.respond_to?(:call)
+      raise(ArgumentError, "Missing termination condition function") unless termination_condition.respond_to?(:call)
 
       current = Metal.new(initial_state, @temperature,
                           energy_calculator: energy_calculator,
