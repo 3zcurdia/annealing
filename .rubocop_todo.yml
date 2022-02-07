@@ -8,8 +8,9 @@
 
 Metrics/AbcSize:
   Exclude:
-    - test/annealing/metal_test.rb
     - test/annealing_test.rb
+    - test/annealing/metal_test.rb
+    - test/annealing/simulator_test.rb
 
 Metrics/ClassLength:
   Exclude:
@@ -17,5 +18,9 @@ Metrics/ClassLength:
 
 Metrics/MethodLength:
   Exclude:
-    - test/**/*.rb
     - lib/annealing/simulator.rb
+    - test/**/*.rb
+
+Minitest/MultipleAssertions:
+  Exclude:
+    - test/annealing/configuration_test.rb

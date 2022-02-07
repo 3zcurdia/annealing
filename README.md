@@ -148,6 +148,21 @@ simulator = Annealing::Simulator.new
 solution = simulator.run(locations, energy_calculator: calculator.method(:energy))
 ```
 
+### Setting a simulation cool down function
+
+By default, the simulation will decrease the `temperature` linearly by `cooling_rate` on each step of the annealing process. In some cases you may wish to override this to use a different temperature reduction algorithm or to hold the temperature at a certain position until another condition is met. To do so, you can specify a `cool_down` object that responds to `#call`. It can be set globally or per simulation, and it should accept three arguments: the `energy` calculation of the current object, the current `temperature` of the annealer, the `cooling_rate` for the simulation, and the number of `steps` the annealer has taken so far.
+
+```ruby
+# Reduce temperature exponentially
+cool_down = lambda do |_energy, temperature, cooling_rate, steps|
+  temperature - (cooling_rate * (steps**2))
+end
+
+simulator = Annealing::Simulator.new
+solution = simulator.run(some_collection, cool_down: cool_down)
+solution.state
+```
+
 ### Setting a simulation termination condition
 
 Typically, annealing simulators are tasked with finding "close enough" solutions to complex problems by continuously comparing new permutations of an object against one other as the temperature slowly drops to 0 and then returning the lowest energy configuration it found. However, sometimes "close enough" can be determined by other factors as well. For this reason, you might specify a termination condition that will stop the annealing process as soon as the "good enough" condition is met regardless of the current temperature.
