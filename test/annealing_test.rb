@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class AnnealingTest < Minitest::Test
   def test_has_a_version_number

@@ -11,9 +11,9 @@ module Annealing
       @energy_calculator = energy_calculator || default_energy_calculator
       @state_change = state_change || default_state_change
 
-      raise(ArgumentError, 'Missing energy calculator function') unless @energy_calculator.respond_to?(:call)
+      raise(ArgumentError, "Missing energy calculator function") unless @energy_calculator.respond_to?(:call)
 
-      raise(ArgumentError, 'Missing state change function') unless @state_change.respond_to?(:call)
+      raise(ArgumentError, "Missing state change function") unless @state_change.respond_to?(:call)
     end
 
     def energy
@@ -33,7 +33,7 @@ module Annealing
     end
 
     def to_s
-      format('%<temperature>.4f:%<energy>.4f:%<value>s',
+      format("%<temperature>.4f:%<energy>.4f:%<value>s",
              temperature: temperature,
              energy: energy,
              value: state)

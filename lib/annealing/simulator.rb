@@ -9,7 +9,7 @@ module Annealing
       @temperature = (temperature || default_temperature).to_f
       @cooling_rate = (cooling_rate || default_cooling_rate).to_f
 
-      raise(ArgumentError, 'Invalid initial temperature') if @temperature.negative?
+      raise(ArgumentError, "Invalid initial temperature") if @temperature.negative?
 
       raise(ArgumentError, 'Invalid initial cooling rate') if @cooling_rate.negative?
     end

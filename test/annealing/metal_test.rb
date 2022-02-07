@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 module Annealing
   class MetalTest < Minitest::Test
@@ -20,7 +20,7 @@ module Annealing
     def test_new_raises_error_if_energy_calculator_not_specified
       # when a global energy_calculator has not been defined
       Annealing.configuration.energy_calculator = nil
-      assert_raises(ArgumentError, 'Missing energy calculator function') do
+      assert_raises(ArgumentError, "Missing energy calculator function") do
         Annealing::Metal.new(@collection, @temperature)
       end
     end
@@ -28,7 +28,7 @@ module Annealing
     def test_new_raises_error_if_state_change_not_specified
       # when a global state_change function has not been defined
       Annealing.configuration.state_change = nil
-      assert_raises(ArgumentError, 'Missing state change function') do
+      assert_raises(ArgumentError, "Missing state change function") do
         Annealing::Metal.new(@collection, @temperature)
       end
     end
