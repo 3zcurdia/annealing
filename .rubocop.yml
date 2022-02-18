@@ -16,18 +16,6 @@ AllCops:
 Layout/LineLength:
   Max: 120
 
-Metrics/AbcSize:
-  Exclude:
-    - test/**/*.rb
-
-Metrics/ClassLength:
-  Exclude:
-    - test/**/*.rb
-
-Metrics/MethodLength:
-  Exclude:
-    - test/**/*.rb
-
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes

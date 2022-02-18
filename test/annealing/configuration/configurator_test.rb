@@ -135,7 +135,7 @@ module Annealing
 
       def test_instance_configs_do_not_pullute_global_configs
         TestConfigurator.new(@instance_config)
-        second_instance  = TestConfigurator.new
+        second_instance = TestConfigurator.new
         assert_equal @global_cool_down, second_instance.cool_down
         assert_equal @global_cooling_rate, second_instance.cooling_rate
         assert_equal @global_energy_calculator, second_instance.energy_calculator
