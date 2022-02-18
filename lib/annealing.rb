@@ -3,6 +3,7 @@
 require "logger"
 require "annealing/version"
 require "annealing/configuration"
+require "annealing/configuration/configurator"
 require "annealing/metal"
 require "annealing/simulator"
 
