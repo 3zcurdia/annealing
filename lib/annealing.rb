@@ -11,6 +11,7 @@ require "annealing/simulator"
 module Annealing
   # Default error class
   class Error < StandardError; end
+
   class << self
     attr_writer :configuration
   end
