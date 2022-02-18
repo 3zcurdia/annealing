@@ -51,7 +51,7 @@ module Annealing
           energy_calculator: :dummy_instance_energy_calculator,
           logger: :dummy_instance_logger,
           temperature: 100.0,
-          state_change: :dummy_instance_state_change,
+          state_change: :dummy_instance_state_change
         }
 
         @local_config = {
@@ -60,7 +60,7 @@ module Annealing
           energy_calculator: :dummy_local_energy_calculator,
           logger: :dummy_local_logger,
           temperature: 1_000.0,
-          state_change: :dummy_local_state_change,
+          state_change: :dummy_local_state_change
         }
 
         # Set global defaults
@@ -140,19 +140,19 @@ module Annealing
         instance_config = @instance_config.slice(:energy_calculator, :logger)
         instance = TestConfigurator.new(instance_config)
         assert_equal({
-          energy_calculator: instance_config[:energy_calculator],
-          logger: instance_config[:logger],
-        }, instance.configuration_overrides)
+                       energy_calculator: instance_config[:energy_calculator],
+                       logger: instance_config[:logger]
+                     }, instance.configuration_overrides)
 
         local_config = @local_config.slice(:temperature, :state_change)
         instance = TestConfigurator.new(instance_config)
         instance.with_configuration_overrides(local_config) do
           assert_equal({
-            energy_calculator: instance_config[:energy_calculator],
-            logger: instance_config[:logger],
-            temperature: local_config[:temperature],
-            state_change: local_config[:state_change],
-          }, instance.configuration_overrides)
+                         energy_calculator: instance_config[:energy_calculator],
+                         logger: instance_config[:logger],
+                         temperature: local_config[:temperature],
+                         state_change: local_config[:state_change]
+                       }, instance.configuration_overrides)
         end
       end
     end

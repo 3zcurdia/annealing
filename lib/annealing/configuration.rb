@@ -4,12 +4,12 @@ module Annealing
   # It enables the gem configuration
   class Configuration
     attr_accessor :cool_down,
-      :cooling_rate,
-      :energy_calculator,
-      :logger,
-      :state_change,
-      :temperature,
-      :termination_condition
+                  :cooling_rate,
+                  :energy_calculator,
+                  :logger,
+                  :state_change,
+                  :temperature,
+                  :termination_condition
 
     def initialize
       @cool_down = lambda do |_energy, temperature, cooling_rate, _steps|

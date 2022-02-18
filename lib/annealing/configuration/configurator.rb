@@ -2,11 +2,13 @@
 
 module Annealing
   class Configuration
+    # Configuration mixin
     module Configurator
       def self.included(base)
         base.send :include, InstanceMethods
       end
 
+      # Mixin methods
       module InstanceMethods
         def initialize(config_hash = {})
           @instance_configuration = config_hash

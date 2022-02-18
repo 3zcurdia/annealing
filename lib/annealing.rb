@@ -25,9 +25,8 @@ module Annealing
     yield(configuration)
   end
 
-  def self.simulate(initial_state)
-    simulator = Simulator.new
-    simulator.run(initial_state).state
+  def self.simulate(initial_state, config_hash = {})
+    Simulator.new.run(initial_state, config_hash).state
   end
 
   def self.logger
