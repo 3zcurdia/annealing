@@ -133,6 +133,39 @@ module Annealing
         end
       end
 
+      def test_instance_configs_do_not_pullute_global_configs
+        TestConfigurator.new(@instance_config)
+        second_instance  = TestConfigurator.new
+        assert_equal @global_cool_down, second_instance.cool_down
+        assert_equal @global_cooling_rate, second_instance.cooling_rate
+        assert_equal @global_energy_calculator, second_instance.energy_calculator
+        assert_equal @global_logger, second_instance.logger
+        assert_equal @global_temperature, second_instance.temperature
+        assert_equal @global_state_change, second_instance.state_change
+      end
+
+      def test_local_configs_do_not_pullute_instance_configs
+        instance = TestConfigurator.new(@instance_config)
+
+        instance.with_configuration_overrides(@local_config) do
+          assert_equal @local_config[:cool_down], instance.cool_down
+          assert_equal @local_config[:cooling_rate], instance.cooling_rate
+          assert_equal @local_config[:energy_calculator], instance.energy_calculator
+          assert_equal @local_config[:logger], instance.logger
+          assert_equal @local_config[:temperature], instance.temperature
+          assert_equal @local_config[:state_change], instance.state_change
+        end
+
+        instance.with_configuration_overrides({}) do
+          assert_equal @instance_config[:cool_down], instance.cool_down
+          assert_equal @instance_config[:cooling_rate], instance.cooling_rate
+          assert_equal @instance_config[:energy_calculator], instance.energy_calculator
+          assert_equal @instance_config[:logger], instance.logger
+          assert_equal @instance_config[:temperature], instance.temperature
+          assert_equal @instance_config[:state_change], instance.state_change
+        end
+      end
+
       def test_can_report_on_current_overrides
         instance = TestConfigurator.new
         assert_empty instance.configuration_overrides
