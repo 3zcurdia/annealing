@@ -3,21 +3,21 @@
 module Annealing
   # It manages the total energy of a given collection
   class Metal
+    include Configuration::Configurator
     attr_reader :state, :temperature
 
-    def initialize(state, temperature, energy_calculator: nil, state_change: nil)
-      @state = state
-      @temperature = temperature
-      @energy_calculator = energy_calculator || default_energy_calculator
-      @state_change = state_change || default_state_change
+    def initialize(current_state, current_temperature, **config)
+      init_configuration(config)
+      @state = current_state
+      @temperature = current_temperature
 
-      raise(ArgumentError, "Missing energy calculator function") unless @energy_calculator.respond_to?(:call)
+      raise(ArgumentError, "Missing energy calculator function") unless energy_calculator.respond_to?(:call)
 
-      raise(ArgumentError, "Missing state change function") unless @state_change.respond_to?(:call)
+      raise(ArgumentError, "Missing state change function") unless state_change.respond_to?(:call)
     end
 
     def energy
-      @energy ||= @energy_calculator.call(state)
+      @energy ||= energy_calculator.call(state)
     end
 
     # This method is not idempotent!
@@ -41,6 +41,14 @@ module Annealing
 
     private
 
+    def energy_calculator
+      current_config_for(:energy_calculator)
+    end
+
+    def state_change
+      current_config_for(:state_change)
+    end
+
     def better_than?(cooled_metal)
       energy_delta = energy - cooled_metal.energy
       energy_delta.positive? ||
@@ -48,18 +56,8 @@ module Annealing
     end
 
     def cool(new_temperature)
-      next_state = @state_change.call(state)
-      Metal.new(next_state, new_temperature,
-                energy_calculator: @energy_calculator,
-                state_change: @state_change)
-    end
-
-    def default_energy_calculator
-      Annealing.configuration.energy_calculator
-    end
-
-    def default_state_change
-      Annealing.configuration.state_change
+      next_state = state_change.call(state)
+      Metal.new(next_state, new_temperature, **configuration_overrides)
     end
   end
 end

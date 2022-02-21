@@ -3,6 +3,7 @@
 require "logger"
 require "annealing/version"
 require "annealing/configuration"
+require "annealing/configuration/configurator"
 require "annealing/metal"
 require "annealing/simulator"
 
@@ -11,6 +12,7 @@ require "annealing/simulator"
 module Annealing
   # Default error class
   class Error < StandardError; end
+
   class << self
     attr_writer :configuration
   end
@@ -23,9 +25,8 @@ module Annealing
     yield(configuration)
   end
 
-  def self.simulate(initial_state)
-    simulator = Simulator.new
-    simulator.run(initial_state).state
+  def self.simulate(initial_state, config_hash = {})
+    Simulator.new.run(initial_state, config_hash).state
   end
 
   def self.logger

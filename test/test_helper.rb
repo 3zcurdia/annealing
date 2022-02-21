@@ -9,7 +9,8 @@ require "ruby-prof"
 module Minitest
   class Test
     def teardown
-      Annealing.configuration.reset
+      # Force configuration to be reinitialized
+      Annealing.configuration = nil
     end
 
     def profile

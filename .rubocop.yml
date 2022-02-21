@@ -13,6 +13,9 @@ AllCops:
   DisplayStyleGuide: true
   ExtraDetails: true
 
+Layout/LineLength:
+  Max: 120
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
@@ -20,6 +23,3 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
-
-Layout/LineLength:
-  Max: 120
