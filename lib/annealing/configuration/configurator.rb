@@ -10,7 +10,7 @@ module Annealing
 
       # Mixin methods
       module InstanceMethods
-        def initialize(config_hash = {})
+        def init_configuration(config_hash = {})
           @instance_configuration = config_hash
           @temporary_configuration = {}
         end

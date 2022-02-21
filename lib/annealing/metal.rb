@@ -6,8 +6,8 @@ module Annealing
     include Configuration::Configurator
     attr_reader :state, :temperature
 
-    def initialize(current_state, current_temperature, config_hash = {})
-      super(config_hash)
+    def initialize(current_state, current_temperature, **config)
+      init_configuration(config)
       @state = current_state
       @temperature = current_temperature
 
@@ -57,7 +57,7 @@ module Annealing
 
     def cool(new_temperature)
       next_state = state_change.call(state)
-      Metal.new(next_state, new_temperature, configuration_overrides)
+      Metal.new(next_state, new_temperature, **configuration_overrides)
     end
   end
 end

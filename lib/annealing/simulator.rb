@@ -5,10 +5,15 @@ module Annealing
   class Simulator
     include Configuration::Configurator
 
+    def initialize(**config)
+      init_configuration(config)
+    end
+
     def run(initial_state, config_hash = {})
       with_configuration_overrides(config_hash) do
         validate_configuration!
-        current = Metal.new(initial_state, temperature, configuration_overrides)
+        current = Metal.new(initial_state, temperature,
+                            **configuration_overrides)
         Annealing.logger.debug("Original: #{current}")
         steps = 0
         until termination_condition_met?(termination_condition, current)

@@ -5,6 +5,10 @@ require "test_helper"
 class TestConfigurator
   include Annealing::Configuration::Configurator
 
+  def initialize(**config)
+    init_configuration(config)
+  end
+
   def cool_down
     current_config_for(:cool_down)
   end
@@ -85,7 +89,7 @@ module Annealing
       end
 
       def test_can_override_global_config_with_instance_config
-        instance = TestConfigurator.new(@instance_config)
+        instance = TestConfigurator.new(**@instance_config)
         assert_equal @instance_config[:cool_down], instance.cool_down
         assert_equal @instance_config[:cooling_rate], instance.cooling_rate
         assert_equal @instance_config[:energy_calculator], instance.energy_calculator
@@ -95,7 +99,7 @@ module Annealing
       end
 
       def test_can_override_instance_config_with_local_config
-        instance = TestConfigurator.new(@instance_config)
+        instance = TestConfigurator.new(**@instance_config)
         instance.with_configuration_overrides(@local_config) do
           assert_equal @local_config[:cool_down], instance.cool_down
           assert_equal @local_config[:cooling_rate], instance.cooling_rate
@@ -108,7 +112,7 @@ module Annealing
 
       def test_can_override_global_config_with_local_config
         @instance_config = {}
-        instance = TestConfigurator.new(@instance_config)
+        instance = TestConfigurator.new(**@instance_config)
         instance.with_configuration_overrides(@local_config) do
           assert_equal @local_config[:cool_down], instance.cool_down
           assert_equal @local_config[:cooling_rate], instance.cooling_rate
@@ -122,7 +126,7 @@ module Annealing
       def test_can_mix_and_match_config_scopes
         instance_config = @instance_config.slice(:energy_calculator, :logger)
         local_config = @local_config.slice(:temperature, :state_change)
-        instance = TestConfigurator.new(instance_config)
+        instance = TestConfigurator.new(**instance_config)
         instance.with_configuration_overrides(local_config) do
           assert_equal @global_cool_down, instance.cool_down
           assert_equal @global_cooling_rate, instance.cooling_rate
@@ -134,7 +138,7 @@ module Annealing
       end
 
       def test_instance_configs_do_not_pullute_global_configs
-        TestConfigurator.new(@instance_config)
+        TestConfigurator.new(**@instance_config)
         second_instance = TestConfigurator.new
         assert_equal @global_cool_down, second_instance.cool_down
         assert_equal @global_cooling_rate, second_instance.cooling_rate
@@ -145,7 +149,7 @@ module Annealing
       end
 
       def test_local_configs_do_not_pullute_instance_configs
-        instance = TestConfigurator.new(@instance_config)
+        instance = TestConfigurator.new(**@instance_config)
 
         instance.with_configuration_overrides(@local_config) do
           assert_equal @local_config[:cool_down], instance.cool_down
@@ -171,14 +175,14 @@ module Annealing
         assert_empty instance.configuration_overrides
 
         instance_config = @instance_config.slice(:energy_calculator, :logger)
-        instance = TestConfigurator.new(instance_config)
+        instance = TestConfigurator.new(**instance_config)
         assert_equal({
                        energy_calculator: instance_config[:energy_calculator],
                        logger: instance_config[:logger]
                      }, instance.configuration_overrides)
 
         local_config = @local_config.slice(:temperature, :state_change)
-        instance = TestConfigurator.new(instance_config)
+        instance = TestConfigurator.new(**instance_config)
         instance.with_configuration_overrides(local_config) do
           assert_equal({
                          energy_calculator: instance_config[:energy_calculator],
