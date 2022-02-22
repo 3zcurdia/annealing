@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+
+## [0.3.0] - 2022-02-21
+
 - Removed the default state change function; you are now required to define a custom `state_change` function for the simulation (#2)
 - Added support for specifying a custom `termination_condition` function to override the default condition of the temperature reaching 0 (#5)
 - Added support for specifying a custom `cool_down` function to override the default linear cooling function (#9)
