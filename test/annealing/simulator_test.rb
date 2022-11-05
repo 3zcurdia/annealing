@@ -138,7 +138,7 @@ module Annealing
       end
 
       Annealing::Metal.stub(:new, metal_klass) do
-        metal.stub(:better_than?, false) do # Always return self
+        metal.stub(:prefer?, false) do # Always prefer self
           final_state = @simulator.run(@collection, cool_down: cool_down)
           metal_klass.verify
           assert_in_delta(-16.0, final_state.temperature)
