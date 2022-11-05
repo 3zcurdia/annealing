@@ -58,7 +58,7 @@ module Annealing
       custom_state_changer.verify
     end
 
-    def test_cooled_returns_cooled_metal_when_prefer
+    def test_cooled_returns_cooled_metal_when_preferred
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:prefer?, true) do
@@ -68,7 +68,7 @@ module Annealing
       refute_equal new_temperature, metal.temperature
     end
 
-    def test_cooled_returns_the_original_metal_when_not_prefer
+    def test_cooled_returns_the_original_metal_when_not_preferred
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:prefer?, false) do
