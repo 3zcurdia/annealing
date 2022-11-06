@@ -24,7 +24,7 @@ module Annealing
     # It relies on random probability to select the next state
     def cool!(new_temperature)
       cooled_metal = cool(new_temperature)
-      if better_than?(cooled_metal)
+      if prefer?(cooled_metal)
         cooled_metal
       else
         @temperature = new_temperature
@@ -49,10 +49,14 @@ module Annealing
       current_config_for(:state_change)
     end
 
-    def better_than?(cooled_metal)
+    # True if cooled_metal.energy is lower than current energy, otherwise let
+    # probability determine if we should accept a higher value over a lower
+    # value
+    def prefer?(cooled_metal)
+      return true if cooled_metal.energy < energy
+
       energy_delta = energy - cooled_metal.energy
-      energy_delta.positive? ||
-        (Math::E**(energy_delta / cooled_metal.temperature)) > rand
+      (Math::E**(energy_delta / cooled_metal.temperature)) > rand
     end
 
     def cool(new_temperature)
