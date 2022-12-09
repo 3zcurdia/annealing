@@ -161,16 +161,6 @@ calculator = PotentialSalesCalculator.new(8)
 Annealing.configuration.energy_calculator = calculator.method(:energy)
 ```
 
-### `logger`
-
-The default logger is a standard Ruby Logger that writes to stdout. You can specify a different `logger` if you wish.
-
-```ruby
-logger = Logger.new('logfile.log')
-logger.level = Logger::DEBUG
-Annealing.configuration.logger = logger
-```
-
 ### `state_change`
 
 As with `energy_calculator`, you must specify a `state_change` function in order to run any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the `state` representing the current state that should be changed. It should return the changed state.

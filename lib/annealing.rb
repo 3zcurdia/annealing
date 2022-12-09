@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "logger"
 require "annealing/version"
 require "annealing/configuration"
 require "annealing/configuration/configurator"
@@ -27,9 +26,5 @@ module Annealing
 
   def self.simulate(initial_state, config_hash = {})
     Simulator.new.run(initial_state, config_hash).state
-  end
-
-  def self.logger
-    configuration.logger
   end
 end

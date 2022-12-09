@@ -18,12 +18,6 @@ module Annealing
       assert_in_delta 0.0003, @configuration.cooling_rate
     end
 
-    def test_sets_the_default_logger
-      logger = @configuration.logger
-      assert_instance_of Logger, logger
-      assert_equal Logger::INFO, @configuration.logger.level
-    end
-
     def test_sets_the_default_temperature
       assert_in_delta 10_000.0, @configuration.temperature
     end
