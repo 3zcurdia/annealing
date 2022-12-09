@@ -35,10 +35,4 @@ class AnnealingTest < Minitest::Test
     global_energy_calculator.verify
     global_state_changer.verify
   end
-
-  def test_returns_the_configuration_logger
-    logger = Logger.new($stdout)
-    Annealing.configure { |config| config.logger = logger }
-    assert_same logger, Annealing.logger
-  end
 end

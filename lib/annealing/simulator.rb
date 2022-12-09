@@ -14,13 +14,11 @@ module Annealing
         validate_configuration!
         current = Metal.new(initial_state, temperature,
                             **configuration_overrides)
-        Annealing.logger.debug("Original: #{current}")
         steps = 0
         until termination_condition_met?(termination_condition, current)
           steps += 1
           current = reduce_temperature(cool_down, current, steps)
         end
-        Annealing.logger.debug("Optimized: #{current}")
         current
       end
     end
@@ -33,10 +31,6 @@ module Annealing
 
     def cooling_rate
       current_config_for(:cooling_rate).to_f
-    end
-
-    def logger
-      current_config_for(:logger)
     end
 
     def temperature
