@@ -32,13 +32,6 @@ module Annealing
       end
     end
 
-    def to_s
-      format("%<temperature>.4f:%<energy>.4f:%<value>s",
-             temperature: temperature,
-             energy: energy,
-             value: state)
-    end
-
     private
 
     def energy_calculator
