@@ -3,21 +3,16 @@
 module Annealing
   # It manages the total energy of a given collection
   class Metal
-    include Configuration::Configurator
-    attr_reader :state, :temperature
+    attr_reader :configuration, :state, :temperature
 
-    def initialize(current_state, current_temperature, **config)
-      init_configuration(config)
+    def initialize(current_state, current_temperature, configuration = nil)
+      @configuration = configuration || Annealing.configuration.merge({})
       @state = current_state
       @temperature = current_temperature
-
-      raise(ArgumentError, "Missing energy calculator function") unless energy_calculator.respond_to?(:call)
-
-      raise(ArgumentError, "Missing state change function") unless state_change.respond_to?(:call)
     end
 
     def energy
-      @energy ||= energy_calculator.call(state)
+      @energy ||= configuration.energy_calculator.call(state)
     end
 
     # This method is not idempotent!
@@ -34,14 +29,6 @@ module Annealing
 
     private
 
-    def energy_calculator
-      current_config_for(:energy_calculator)
-    end
-
-    def state_change
-      current_config_for(:state_change)
-    end
-
     # True if cooled_metal.energy is lower than current energy, otherwise let
     # probability determine if we should accept a higher value over a lower
     # value
@@ -53,8 +40,8 @@ module Annealing
     end
 
     def cool(new_temperature)
-      next_state = state_change.call(state)
-      Metal.new(next_state, new_temperature, **configuration_overrides)
+      next_state = configuration.state_change.call(state)
+      Metal.new(next_state, new_temperature, configuration)
     end
   end
 end
