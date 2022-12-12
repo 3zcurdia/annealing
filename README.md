@@ -102,12 +102,26 @@ The annealer supports a number of configuration options. See the [configuration 
 
 ### `cool_down`
 
-By default, the simulation will decrease the `temperature` linearly by `cooling_rate` on each step of the annealing process. In some cases you may wish to override this to use a different cooling algorithm. To do so, you can specify a custom `cool_down` function. The function can be any object that responds to `#call` and accepts three arguments: the `energy` calculation of the current object, the current `temperature` of the annealer, the `cooling_rate` for the simulation, and the number of `steps` the annealer has taken so far. It should return the new temperature as a Float.
+By default, the simulation will decrease the `temperature` linearly by `cooling_rate` on each step of the annealing process. In some cases you may wish to override this to use a different cooling algorithm. To do so, you can use one of the other built-in cooling functions or you can specify a custom `cool_down` function. Custom functions can be any object that responds to `#call` and accepts four arguments: the `energy` calculation of the current object, the current `temperature` of the annealer, the `cooling_rate` for the simulation, and the number of `steps` the annealer has taken so far. It should return the new temperature as a Float.
 
 ```ruby
-Annealing.configuration.cool_down = lambda do |_energy, temperature, cooling_rate, steps|
-  # Reduce temperature exponentially
-  temperature - (cooling_rate * (steps**2))
+# Use the built-in linear cool-down function (the default)
+Annealing.configuration.cool_down = Annealing::Configuration::Coolers.linear
+
+# Use the built-in exponential cool-down function
+Annealing.configuration.cool_down = Annealing::Configuration::Coolers.exponential
+
+# Use the built-in geometric cool-down function with a custom ratio (default ratio is 2)
+Annealing.configuration.cool_down = Annealing::Configuration::Coolers.exponential(1.5)
+
+# Use a custom cool down function
+Annealing.configuration.cool_down = lambda do |energy, temperature, cooling_rate, steps|
+  # Reduce temperature exponentially when the temperature is above 500, then linearly
+  if temperature > 500
+    Annealing::Configuration::Coolers.exponential.call(energy, temperature, cooling_rate, steps)
+  else
+    Annealing::Configuration::Coolers.linear.call(energy, temperature, cooling_rate, steps)
+  end
 end
 ```
 
@@ -183,12 +197,19 @@ Annealing.configuration.state_change = instance.method(:state_change)
 
 ### `termination_condition`
 
-By default, a simulation will run until the temperature reaches 0. In some cases, you might want to specify a termination condition that will stop the annealing process as soon as some other condition is met regardless of the current temperature. You can define a custom `termination_condition` function, which can be any object that responds to `#call` and accepts three arguments: the current `state` of the object, the `energy` calculation of the current object, and the current `temperature` of the simulation. It should return a boolean value where `true` indicates the simulation should stop.
+By default, a simulation will run until the temperature reaches 0. In some cases, you might want to specify a termination condition that will stop the annealing process as soon as some other condition is met regardless of the current temperature. To do so, you can use one of the other built-in termination condition functions or you can specify a custom one. Custom `termination_condition` functions can be any object that responds to `#call` and accepts three arguments: the current `state` of the object, the `energy` calculation of the current object, and the current `temperature` of the simulation. It should return a boolean value where `true` indicates the simulation should stop.
 
 ```ruby
+# Use the built-in zero-temperature termination condition function
+Annealing.configuration.termination_condition = Annealing::Configuration::Terminators.temp_is_zero?
+
+# Use the built-in zero-energy termination condition function
+Annealing.configuration.termination_condition = Annealing::Configuration::Terminators.energy_or_temp_is_zero?
+
+# Use a custom termination condition function
 Annealing.configuration.termination_condition = lambda do |_state, energy, temperature|
-  # Stop early if we encounter any 0-energy state
-  energy == 0 || temperature <= 0.0
+  # Stop if the energy is below 500 and the temperature is below 100, or the temperature is already 0
+  temperature <= 0 || (energy <= 500 && temperature <= 500)
 end
 ```
 

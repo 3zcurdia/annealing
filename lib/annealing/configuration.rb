@@ -5,14 +5,6 @@ module Annealing
   class Configuration
     DEFAULT_COOLING_RATE = 0.0003
     DEFAULT_INITIAL_TEMPERATURE = 10_000.0
-    DEFAULT_COOL_DOWN = lambda { |_energy, temperature, cooling_rate, _steps|
-      # Linear reduction in temperature
-      temperature - cooling_rate
-    }
-    DEFAULT_TERMINATION_CONDITION = lambda { |_state, _energy, temperature|
-      # Simulation ends when temperature reaches zero
-      temperature <= 0.0
-    }
 
     class ConfigurationError < Annealing::Error; end
 
@@ -24,7 +16,7 @@ module Annealing
                   :termination_condition
 
     def initialize(config_hash = {})
-      @cool_down = config_hash.fetch(:cool_down, DEFAULT_COOL_DOWN)
+      @cool_down = config_hash.fetch(:cool_down, Coolers.linear)
       @cooling_rate = config_hash.fetch(:cooling_rate,
                                         DEFAULT_COOLING_RATE).to_f
       @energy_calculator = config_hash.fetch(:energy_calculator, nil)
@@ -32,7 +24,7 @@ module Annealing
       @temperature  = config_hash.fetch(:temperature,
                                         DEFAULT_INITIAL_TEMPERATURE).to_f
       @termination_condition = config_hash.fetch(:termination_condition,
-                                                 DEFAULT_TERMINATION_CONDITION)
+                                                 Terminators.temp_is_zero?)
     end
 
     # Return new configuration that merges new attributes with current
@@ -75,3 +67,6 @@ module Annealing
     end
   end
 end
+
+require "annealing/configuration/coolers"
+require "annealing/configuration/terminators"
