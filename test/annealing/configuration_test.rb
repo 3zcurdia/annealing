@@ -15,7 +15,6 @@ module Annealing
 
     def test_sets_a_default_linear_cool_down_function
       cool_down = @subject.new.cool_down
-      assert_equal @subject::DEFAULT_COOL_DOWN, cool_down
       assert_respond_to cool_down, :call
       assert_equal 1, cool_down.call(nil, 2, 1, nil)
     end
@@ -32,8 +31,6 @@ module Annealing
 
     def test_sets_a_default_termination_condition_function
       termination_condition = @subject.new.termination_condition
-      assert_equal @subject::DEFAULT_TERMINATION_CONDITION,
-                   termination_condition
       assert_respond_to termination_condition, :call
       refute termination_condition.call(nil, nil, 1)
       assert termination_condition.call(nil, nil, 0)
