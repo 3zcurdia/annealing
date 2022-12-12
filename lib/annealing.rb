@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-require "annealing/version"
-require "annealing/configuration"
-require "annealing/configuration/configurator"
-require "annealing/metal"
-require "annealing/simulator"
-
 # Simulated Annealing algoritm
 # https://en.wikipedia.org/wiki/Simulated_annealing
 module Annealing
@@ -22,9 +16,15 @@ module Annealing
 
   def self.configure
     yield(configuration)
+    configuration
   end
 
   def self.simulate(initial_state, config_hash = {})
     Simulator.new.run(initial_state, config_hash).state
   end
 end
+
+require "annealing/configuration"
+require "annealing/metal"
+require "annealing/simulator"
+require "annealing/version"
