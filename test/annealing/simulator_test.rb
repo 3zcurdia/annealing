@@ -24,6 +24,7 @@ module Annealing
 
     def test_inherits_global_configuration_by_default
       simulator_config = @simulator.configuration
+
       assert_equal @global_config.cool_down,
                    simulator_config.cool_down
       assert_equal @global_config.cooling_rate,
@@ -45,6 +46,7 @@ module Annealing
         state_change: ->(state) { state.shuffle },
         temperature: 99
       ).configuration
+
       refute_equal @global_config.cooling_rate,
                    simulator_config.cooling_rate
       refute_equal @global_config.energy_calculator,
@@ -61,6 +63,7 @@ module Annealing
       }
       state = @simulator.run(@collection,
                              termination_condition: termination_condition)
+
       assert_equal @temperature - 10, state.temperature
     end
 
@@ -86,6 +89,7 @@ module Annealing
                                                  final_temp])
       state = @simulator.run(@collection,
                              termination_condition: termination_condition)
+
       assert_equal final_temp, state.temperature
       termination_condition.verify
     end
@@ -99,6 +103,7 @@ module Annealing
                                            @cooling_rate, step + 1])
       end
       state = @simulator.run(@collection, cool_down: cool_down)
+
       assert_equal 0, state.temperature
       cool_down.verify
     end
