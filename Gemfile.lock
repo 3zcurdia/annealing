@@ -47,7 +47,7 @@ DEPENDENCIES
   annealing!
   debug (>= 1.0.0)
   minitest (~> 5.0)
-  rake
+  rake (~> 13.0.0, >= 13.0.6)
   rubocop (~> 1.48.0)
   rubocop-minitest (~> 0.29.0)
   rubocop-performance (~> 1.16.0)
