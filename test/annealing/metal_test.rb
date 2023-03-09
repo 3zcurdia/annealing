@@ -22,6 +22,7 @@ module Annealing
       custom_calculator.expect(:call, 42, [@collection])
       local_config = @global_config.merge(energy_calculator: custom_calculator)
       metal = Annealing::Metal.new(@collection, @temperature, local_config)
+
       assert_equal 42, metal.energy
     end
 
@@ -29,6 +30,7 @@ module Annealing
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.cool!(new_temperature)
+
       assert_instance_of Annealing::Metal, cooled_metal
       assert_equal new_temperature, cooled_metal.temperature
     end
@@ -48,6 +50,7 @@ module Annealing
       cooled_metal = metal.stub(:prefer?, true) do
         metal.cool!(new_temperature)
       end
+
       refute_same metal, cooled_metal
       refute_equal new_temperature, metal.temperature
     end
@@ -58,6 +61,7 @@ module Annealing
       cooled_metal = metal.stub(:prefer?, false) do
         metal.cool!(new_temperature)
       end
+
       assert_same metal, cooled_metal
       assert_equal new_temperature, metal.temperature
     end

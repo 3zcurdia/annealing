@@ -15,6 +15,7 @@ module Annealing
       def test_linear_cooler_reduces_temperature_linearly
         cooler = @coolers.linear
         cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+
         assert_in_delta @temperature - @cooling_rate,
                         cooled_temp
       end
@@ -22,6 +23,7 @@ module Annealing
       def test_exponential_cooler_reduces_temperature_exponentially
         cooler = @coolers.exponential
         cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+
         assert_in_delta @temperature - (Math.exp(@step - 1) * @cooling_rate),
                         cooled_temp
       end
@@ -30,6 +32,7 @@ module Annealing
         ratio = 3
         cooler = @coolers.geometric(ratio)
         cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+
         assert_in_delta @temperature - (@cooling_rate * (ratio**(@step - 1))),
                         cooled_temp
       end
