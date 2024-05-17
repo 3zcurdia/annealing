@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.4.0] - 2023-03-09
+
+- Rename method and add comments to clarify use by @chrisbloom7 in #20
+- Config Cleanup: remove logger config by @chrisbloom7 in #21
+- Simply configuration and overrides by @chrisbloom7 in #22
+- Idea: Add library of built-in functions by @chrisbloom7 in #23
 
 ## [0.3.0] - 2022-02-21
 
