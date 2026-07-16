@@ -5,7 +5,7 @@ module Annealing
   class Configuration
     DEFAULT_COOLING_RATE = 0.0003
     DEFAULT_INITIAL_TEMPERATURE = 10_000.0
-    DEFAULT_RETURN_BEST = true
+    DEFAULT_RETURN_BEST = false
 
     class ConfigurationError < Annealing::Error; end
 
