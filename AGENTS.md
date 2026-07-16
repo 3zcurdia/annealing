@@ -30,11 +30,11 @@ simulated annealing. See `README.md` for the public API and configuration preced
 
 ## Style / rubocop
 
-- Inherited from `.rubocop.yml` + `.rubocop_todo.yml`. `TargetRubyVersion: 3.0`,
+- Inherited from `.rubocop.yml` + `.rubocop_todo.yml`. `TargetRubyVersion: 3.4`,
   `Layout/LineLength: Max 120`, double-quoted strings, NewCops enabled with rubocop-
   performance/-minitest/-rake plugins loaded.
-- CI lint job runs `bundle exec rubocop --parallel` on Ruby 3.0; test matrix is 3.0/3.1/3.2
-  (see `.github/workflows/ruby.yml`). Keep code compatible with 3.0.
+- CI lint job runs `bundle exec rubocop --parallel` on Ruby 4.0; test matrix is 3.4/4.0
+  (see `.github/workflows/ruby.yml`). Keep code compatible with 3.4.
 
 ## Architecture
 

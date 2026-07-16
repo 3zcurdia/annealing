@@ -65,7 +65,7 @@ module Annealing
       new_temperature = 3000
       new_config = @valid_configuration.merge(temperature: new_temperature)
 
-      refute_equal @valid_configuration.object_id, new_config.object_id
+      refute_same @valid_configuration, new_config
       assert_equal new_config.temperature, new_temperature
       refute_equal @valid_configuration.temperature, new_config.temperature
     end
