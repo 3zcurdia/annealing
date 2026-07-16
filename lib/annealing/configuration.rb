@@ -5,12 +5,14 @@ module Annealing
   class Configuration
     DEFAULT_COOLING_RATE = 0.0003
     DEFAULT_INITIAL_TEMPERATURE = 10_000.0
+    DEFAULT_RETURN_BEST = false
 
     class ConfigurationError < Annealing::Error; end
 
     attr_accessor :cool_down,
                   :cooling_rate,
                   :energy_calculator,
+                  :return_best,
                   :state_change,
                   :temperature,
                   :termination_condition
@@ -20,6 +22,7 @@ module Annealing
       @cooling_rate = config_hash.fetch(:cooling_rate,
                                         DEFAULT_COOLING_RATE).to_f
       @energy_calculator = config_hash.fetch(:energy_calculator, nil)
+      @return_best = config_hash.fetch(:return_best, DEFAULT_RETURN_BEST)
       @state_change = config_hash.fetch(:state_change, nil)
       @temperature  = config_hash.fetch(:temperature,
                                         DEFAULT_INITIAL_TEMPERATURE).to_f
@@ -39,6 +42,8 @@ module Annealing
                   "Cooling rate cannot be negative"
                 elsif !callable?(energy_calculator)
                   "Missing energy calculator function"
+                elsif ![true, false].include?(return_best)
+                  "'Return best' specification must be either true or false"
                 elsif !callable?(state_change)
                   "Missing state change function"
                 elsif temperature.negative?
@@ -56,6 +61,7 @@ module Annealing
         cool_down: cool_down,
         cooling_rate: cooling_rate,
         energy_calculator: energy_calculator,
+        return_best: return_best,
         state_change: state_change,
         temperature: temperature,
         termination_condition: termination_condition

@@ -44,14 +44,20 @@ solution = simulator.run(locations,
                          energy_calculator: energy_calculator,
                          state_change: state_change)
 
+initial_energy = energy_calculator.call(locations)
 puts "\nInitial itinerary:"
 locations.each_cons(2).with_index do |(location1, location2), index|
   puts "Stop ##{index + 1}: #{location1.name} -> #{location2.name} (#{location1.distance(location2)})"
 end
-puts "-------\nEnergy: #{energy_calculator.call(locations)}"
+puts "-------\nEnergy: #{initial_energy}"
 
 puts "\nAnnealed itinerary:"
 solution.state.each_cons(2).with_index do |(location1, location2), index|
   puts "Stop ##{index + 1}: #{location1.name} -> #{location2.name} (#{location1.distance(location2)})"
 end
 puts "-------\nEnergy: #{solution.energy}"
+
+if solution.energy > initial_energy
+  raise "Annealing failed: solution energy #{solution.energy}\
+ ought to be less than or equal to than initial energy #{initial_energy}"
+end

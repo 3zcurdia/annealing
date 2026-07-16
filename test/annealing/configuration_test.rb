@@ -145,5 +145,13 @@ module Annealing
         @valid_configuration.validate!
       end
     end
+
+    def test_validates_return_best
+      @valid_configuration.validate!
+      @valid_configuration.return_best = nil
+      assert_raises(@error_class, "'Return best' specification must be either true or false") do
+        @valid_configuration.validate!
+      end
+    end
   end
 end

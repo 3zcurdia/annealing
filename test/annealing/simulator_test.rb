@@ -123,5 +123,44 @@ module Annealing
       energy_calculator.verify
       state_changer.verify
     end
+
+    def real_energy_calculator(ary)
+      ary[-1]
+    end
+
+    def test_finds_optimal_solution_when_return_best
+      initial_energy = real_energy_calculator(@collection)
+      final_metal = @simulator.run(@collection,
+                                   energy_calculator: ->(x) { real_energy_calculator(x) },
+                                   state_change: ->(state) { state.shuffle },
+                                   return_best: true)
+      final_energy = real_energy_calculator(final_metal.state)
+
+      assert final_energy < initial_energy
+      # we gave it plenty of time to find the optimal solution
+      assert_equal 1, final_energy
+    end
+
+    def test_finds_suboptimal_solution_when_not_return_best
+      max_iterations = 10
+      initial_energy = real_energy_calculator(@collection)
+      final_energy = 1
+      iteration_count = 0
+
+      # The simulator might happen to finish on the optimal state by random chance.
+      # If that happens, run it again up to MAX_ITERATIONS times.
+      until final_energy > 1 || iteration_count > max_iterations
+        iteration_count += 1
+        final_metal = @simulator.run(@collection,
+                                     energy_calculator: ->(x) { real_energy_calculator(x) },
+                                     state_change: ->(state) { state.shuffle },
+                                     return_best: false)
+        final_energy = real_energy_calculator(final_metal.state)
+
+        assert final_energy < initial_energy
+      end
+
+      refute_equal 1, final_energy
+    end
   end
 end

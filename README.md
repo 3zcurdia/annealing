@@ -213,6 +213,10 @@ Annealing.configuration.termination_condition = lambda do |_state, energy, tempe
 end
 ```
 
+### 'return_best'
+
+If true (the default), will return the best (lowest energy) state seen during the simulation. If false, Simulator#run will return the final state reached when the simulation completes.
+
 ## Configuration precedence
 
 Configuration options can be set globally using `Annealing.configuration` or `Annealing.configure`, on `Annealing::Simulator.new` to be used on all subsequent runs of that instance, and just-in-time on `Annealing.simulate` and `Annealing::Simulator#run`. They are applied in reverse order of precedence.
