@@ -124,43 +124,34 @@ module Annealing
       state_changer.verify
     end
 
-    def real_energy_calculator(ary)
-      ary[-1]
+    def run_fixed_simulation(return_best:)
+      energies = { a: 5, b: 4, c: 1, d: 6 }
+      state_sequence = %i[b c d].each
+      call_count = 0
+
+      Kernel.stub(:rand, 0.0) do
+        @simulator.run(:a,
+                       energy_calculator: ->(s) { energies.fetch(s) },
+                       state_change: ->(_) { state_sequence.next },
+                       cool_down: ->(_energy, temp, _rate, _step) { temp - 1 },
+                       termination_condition: ->(_s, _e, _t) { (call_count += 1) >= 4 },
+                       return_best: return_best)
+      end
     end
 
     def test_finds_optimal_solution_when_return_best
-      initial_energy = real_energy_calculator(@collection)
-      final_metal = @simulator.run(@collection,
-                                   energy_calculator: ->(x) { real_energy_calculator(x) },
-                                   state_change: lambda(&:shuffle),
-                                   return_best: true)
-      final_energy = real_energy_calculator(final_metal.state)
+      final_metal = run_fixed_simulation(return_best: true)
 
-      assert_operator final_energy, :<, initial_energy
-      # we gave it plenty of time to find the optimal solution
-      assert_equal 1, final_energy
+      assert_equal :c, final_metal.state
+      assert_equal 1, final_metal.energy
     end
 
     def test_finds_suboptimal_solution_when_not_return_best
-      max_iterations = 10
-      initial_energy = real_energy_calculator(@collection)
-      final_energy = 1
-      iteration_count = 0
+      final_metal = run_fixed_simulation(return_best: false)
 
-      # The simulator might happen to finish on the optimal state by random chance.
-      # If that happens, run it again up to MAX_ITERATIONS times.
-      until final_energy > 1 || iteration_count > max_iterations
-        iteration_count += 1
-        final_metal = @simulator.run(@collection,
-                                     energy_calculator: ->(x) { real_energy_calculator(x) },
-                                     state_change: lambda(&:shuffle),
-                                     return_best: false)
-        final_energy = real_energy_calculator(final_metal.state)
-
-        assert_operator final_energy, :<, initial_energy
-      end
-
-      refute_equal 1, final_energy
+      assert_equal :d, final_metal.state
+      assert_equal 6, final_metal.energy
+      refute_equal :c, final_metal.state
     end
   end
 end
