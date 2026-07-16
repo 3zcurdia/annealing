@@ -16,8 +16,8 @@ class AnnealingTest < Minitest::Test
     custom_cooling_rate = 1
     total_iterations = custom_temperature / custom_cooling_rate
     collection = (1..10).to_a.shuffle
-    global_energy_calculator = MiniTest::Mock.new
-    global_state_changer = MiniTest::Mock.new
+    global_energy_calculator = Minitest::Mock.new
+    global_state_changer = Minitest::Mock.new
     total_iterations.times do
       global_energy_calculator.expect(:call, 42, [collection])
       global_state_changer.expect(:call, collection, [collection])
