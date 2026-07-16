@@ -62,4 +62,4 @@ DEPENDENCIES
   ruby-prof (~> 1.6, >= 1.6.1)
 
 BUNDLED WITH
-   2.4.4
+   2.5.22
