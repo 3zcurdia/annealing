@@ -1,4 +1,4 @@
-## [Unreleased] - 2025-03-20
+## [0.4.1] - 2026-07-16
 
 - Add return_best config option. When true, returns the best (lowest energy) state. When false, returns the final state (preserves old behavior).
 - Bump minimum supported Ruby version to 3.4.0 and add Ruby 4.0 support.
