@@ -76,7 +76,7 @@ module Annealing
     end
 
     def test_runs_simulation_until_termination_condition_is_met
-      termination_condition = MiniTest::Mock.new
+      termination_condition = Minitest::Mock.new
       @total_iterations.times do |step|
         current_temp = @temperature - (@cooling_rate * step)
         termination_condition.expect(:call, false, [@collection,
@@ -95,7 +95,7 @@ module Annealing
     end
 
     def test_uses_cool_down_function_to_reduce_temperature_at_each_step
-      cool_down = MiniTest::Mock.new
+      cool_down = Minitest::Mock.new
       @total_iterations.times do |step|
         current_temp = @temperature - (@cooling_rate * step)
         new_temp = @temperature - ((@cooling_rate * step) + 1)
@@ -109,8 +109,8 @@ module Annealing
     end
 
     def test_passes_run_time_configuration_to_metal
-      energy_calculator = MiniTest::Mock.new
-      state_changer = MiniTest::Mock.new
+      energy_calculator = Minitest::Mock.new
+      state_changer = Minitest::Mock.new
       @total_iterations.times do
         energy_calculator.expect(:call, @fake_energy, [@collection])
         state_changer.expect(:call, @collection, [@collection])
