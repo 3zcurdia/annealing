@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+- Bump minimum supported Ruby version to 3.4.0 and add Ruby 4.0 support.
+- Refresh development dependencies (rubocop, ruby-prof, and plugins) to versions
+  compatible with Ruby 4.0.
+- Bump RuboCop `TargetRubyVersion` to 3.4 and CI test matrix to 3.4 / 4.0.
+
 ## [0.4.0] - 2023-03-09
 
 - Rename method and add comments to clarify use by @chrisbloom7 in #20

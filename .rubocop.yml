@@ -1,12 +1,12 @@
 inherit_from: .rubocop_todo.yml
 
-require:
+plugins:
   - rubocop-performance
   - rubocop-minitest
   - rubocop-rake
 
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.4
   NewCops: enable
   DefaultFormatter: progress
   DisplayCopNames: true

@@ -43,7 +43,7 @@ module Annealing
       simulator_config = Annealing::Simulator.new(
         cooling_rate: 0.1,
         energy_calculator: ->(_) { 999 },
-        state_change: ->(state) { state.shuffle },
+        state_change: lambda(&:shuffle),
         temperature: 99
       ).configuration
 

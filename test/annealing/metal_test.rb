@@ -13,7 +13,7 @@ module Annealing
         config.energy_calculator = lambda do |collection|
           collection.each_with_index.sum { |n, i| Math.exp(i) * n }
         end
-        config.state_change = ->(collection) { collection.shuffle }
+        config.state_change = lambda(&:shuffle)
       end
     end
 
