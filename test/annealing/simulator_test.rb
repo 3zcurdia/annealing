@@ -132,11 +132,11 @@ module Annealing
       initial_energy = real_energy_calculator(@collection)
       final_metal = @simulator.run(@collection,
                                    energy_calculator: ->(x) { real_energy_calculator(x) },
-                                   state_change: ->(state) { state.shuffle },
+                                   state_change: lambda(&:shuffle),
                                    return_best: true)
       final_energy = real_energy_calculator(final_metal.state)
 
-      assert final_energy < initial_energy
+      assert_operator final_energy, :<, initial_energy
       # we gave it plenty of time to find the optimal solution
       assert_equal 1, final_energy
     end
@@ -153,11 +153,11 @@ module Annealing
         iteration_count += 1
         final_metal = @simulator.run(@collection,
                                      energy_calculator: ->(x) { real_energy_calculator(x) },
-                                     state_change: ->(state) { state.shuffle },
+                                     state_change: lambda(&:shuffle),
                                      return_best: false)
         final_energy = real_energy_calculator(final_metal.state)
 
-        assert final_energy < initial_energy
+        assert_operator final_energy, :<, initial_energy
       end
 
       refute_equal 1, final_energy
