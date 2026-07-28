@@ -19,7 +19,9 @@ module Annealing
 
     def test_energy_calls_energy_calculator_with_current_state
       custom_calculator = Minitest::Mock.new
-      custom_calculator.expect(:call, 42, [@collection])
+      step_mock = Minitest::Mock.new
+      step_mock.expect(:state, @collection)
+      custom_calculator.expect(:call, 42, [step_mock])
       local_config = @global_config.merge(energy_calculator: custom_calculator)
       metal = Annealing::Metal.new(@collection, @temperature, local_config)
 
@@ -37,7 +39,9 @@ module Annealing
 
     def test_cooled_calls_state_change_function_with_current_state
       custom_state_changer = Minitest::Mock.new
-      custom_state_changer.expect(:call, [], [@collection])
+      step_mock = Minitest::Mock.new
+      step_mock.expect(:state, @collection)
+      custom_state_changer.expect(:call, [], [step_mock])
       local_config = @global_config.merge(state_change: custom_state_changer)
       metal = Annealing::Metal.new(@collection, @temperature, local_config)
       metal.cool!(@temperature)

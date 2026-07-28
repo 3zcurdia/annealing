@@ -12,20 +12,26 @@ module Annealing
       def test_zero_temperature_terminator_true_when_temperature_is_zero
         terminator = @terminators.temp_is_zero?
 
-        assert terminator.call(nil, nil, 0)
-        assert terminator.call(nil, nil, -1)
-        refute terminator.call(nil, nil, 1)
+        mock_step_0 = Minitest::Mock.new
+        mock_step_0.expect(:temperature, 0)
+        assert terminator.call(mock_step_0)
+
+        mock_step_neg = Minitest::Mock.new
+        mock_step_neg.expect(:temperature, -1)
+        assert terminator.call(mock_step_neg)
+
+        mock_step_pos = Minitest::Mock.new
+        mock_step_pos.expect(:temperature, 1)
+        refute terminator.call(mock_step_pos)
       end
 
       def test_zero_energy_terminator_true_when_energy_or_temperature_is_zero
         terminator = @terminators.energy_or_temp_is_zero?
 
-        assert terminator.call(nil, 0, 0)
-        assert terminator.call(nil, 0, 1)
-        assert terminator.call(nil, 1, 0)
-        assert terminator.call(nil, 1, -1)
-        assert terminator.call(nil, -1, 1)
-        refute terminator.call(nil, 1, 1)
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:energy, 0)
+        mock_step.expect(:temperature, 1)
+        assert terminator.call(mock_step)
       end
     end
   end

@@ -17,7 +17,10 @@ module Annealing
       cool_down = @subject.new.cool_down
 
       assert_respond_to cool_down, :call
-      assert_equal 1, cool_down.call(nil, 2, 1, nil)
+      mock_step = Minitest::Mock.new
+      mock_step.expect(:temperature, 2)
+      mock_step.expect(:cooling_rate, 1)
+      assert_equal 1, cool_down.call(mock_step)
     end
 
     def test_sets_a_default_cooling_rate
@@ -34,9 +37,12 @@ module Annealing
       termination_condition = @subject.new.termination_condition
 
       assert_respond_to termination_condition, :call
-      refute termination_condition.call(nil, nil, 1)
-      assert termination_condition.call(nil, nil, 0)
-      assert termination_condition.call(nil, nil, -1)
+      mock_step_1 = Minitest::Mock.new
+      mock_step_1.expect(:temperature, 1)
+      refute termination_condition.call(mock_step_1)
+      mock_step_0 = Minitest::Mock.new
+      mock_step_0.expect(:temperature, 0)
+      assert termination_condition.call(mock_step_0)
     end
 
     def test_does_not_set_a_default_energy_calculator_function

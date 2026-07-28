@@ -8,15 +8,15 @@ module Annealing
 
       # Reduce temperature linearly by the cooling rate
       def linear
-        lambda { |_energy, temperature, cooling_rate, _steps|
-          temperature - cooling_rate
+        lambda { |step|
+          step.temperature - step.cooling_rate
         }
       end
 
       # Reduce temperature exponentially on each step by the cooling rate
       def exponential
-        lambda { |_energy, temperature, cooling_rate, steps|
-          temperature - (Math.exp(steps - 1) * cooling_rate)
+        lambda { |step|
+          step.temperature - (Math.exp(step.steps - 1) * step.cooling_rate)
         }
       end
 
@@ -27,8 +27,8 @@ module Annealing
                 "geometric ratio must be positive")
         end
 
-        lambda { |_energy, temperature, cooling_rate, steps|
-          temperature - (cooling_rate * (ratio**(steps - 1)))
+        lambda { |step|
+          step.temperature - (step.cooling_rate * (ratio**(step.steps - 1)))
         }
       end
     end

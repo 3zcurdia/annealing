@@ -24,6 +24,15 @@ module Annealing
   end
 end
 
+# Represents the current state of the annealing process during any given iteration.
+Annealing::Step = Struct.new(:metal, :configuration, :iteration) do
+  def state; metal.state; end
+  def energy; metal.energy; end
+  def temperature; metal.temperature; end
+  def cooling_rate; configuration.cooling_rate; end
+  def steps; iteration; end
+end
+
 require "annealing/configuration"
 require "annealing/metal"
 require "annealing/simulator"
