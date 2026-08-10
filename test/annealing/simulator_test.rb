@@ -78,15 +78,18 @@ module Annealing
     def test_runs_simulation_until_termination_condition_is_met
       termination_condition = Minitest::Mock.new
       @total_iterations.times do |step|
-        current_temp = @temperature - (@cooling_rate * step)
-        termination_condition.expect(:call, false, [@collection,
-                                                    @fake_energy,
-                                                    current_temp])
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:state, @collection)
+        mock_step.expect(:energy, @fake_energy)
+        mock_step.expect(:temperature, @temperature - (@cooling_rate * step))
+        termination_condition.expect(:call, false, [mock_step])
       end
       final_temp = @temperature - (@cooling_rate * @total_iterations)
-      termination_condition.expect(:call, true, [@collection,
-                                                 @fake_energy,
-                                                 final_temp])
+      mock_step_final = Minitest::Mock.new
+      mock_step_final.expect(:state, @collection)
+      mock_step_final.expect(:energy, @fake_energy)
+      mock_step_final.expect(:temperature, final_temp)
+      termination_condition.expect(:call, true, [mock_step_final])
       state = @simulator.run(@collection,
                              termination_condition: termination_condition)
 
@@ -97,10 +100,13 @@ module Annealing
     def test_uses_cool_down_function_to_reduce_temperature_at_each_step
       cool_down = Minitest::Mock.new
       @total_iterations.times do |step|
-        current_temp = @temperature - (@cooling_rate * step)
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:energy, @fake_energy)
+        mock_step.expect(:temperature, @temperature - (@cooling_rate * step))
+        mock_step.expect(:cooling_rate, @cooling_rate)
+        mock_step.expect(:steps, step + 1)
         new_temp = @temperature - ((@cooling_rate * step) + 1)
-        cool_down.expect(:call, new_temp, [@fake_energy, current_temp,
-                                           @cooling_rate, step + 1])
+        cool_down.expect(:call, new_temp, [mock_step])
       end
       state = @simulator.run(@collection, cool_down: cool_down)
 
@@ -131,10 +137,10 @@ module Annealing
 
       Kernel.stub(:rand, 0.0) do
         @simulator.run(:a,
-                       energy_calculator: ->(s) { energies.fetch(s) },
-                       state_change: ->(_) { state_sequence.next },
-                       cool_down: ->(_energy, temp, _rate, _step) { temp - 1 },
-                       termination_condition: ->(_s, _e, _t) { (call_count += 1) >= 4 },
+                       energy_calculator: ->(step) { energies.fetch(step.state) },
+                       state_change: ->(step) { state_sequence.next },
+                       cool_down: ->(step) { step.temperature - 1 },
+                       termination_condition: ->(step) { (call_count += 1) >= 4 },
                        return_best: return_best)
       end
     end

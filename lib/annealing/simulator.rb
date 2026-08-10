@@ -16,7 +16,7 @@ module Annealing
         current = Metal.new(initial_state, initial_temperature, runtime_config)
         best = current
         steps = 0
-        until termination_condition_met?(current, runtime_config)
+        until termination_condition_met?(current, steps, runtime_config)
           steps += 1
           current = reduce_temperature(current, steps, runtime_config)
           # If the current state has lower energy than the previous best (lowest energy) state
@@ -42,17 +42,14 @@ module Annealing
     end
 
     def reduce_temperature(metal, steps, config)
-      new_temperature = config.cool_down.call(metal.energy,
-                                              metal.temperature,
-                                              config.cooling_rate,
-                                              steps)
+      step = Annealing::Step.new(metal, config, steps)
+      new_temperature = config.cool_down.call(step)
       metal.cool!(new_temperature)
     end
 
-    def termination_condition_met?(metal, config)
-      config.termination_condition.call(metal.state,
-                                        metal.energy,
-                                        metal.temperature)
+    def termination_condition_met?(metal, steps, config)
+      step = Annealing::Step.new(metal, config, steps)
+      config.termination_condition.call(step)
     end
 
     def final_or_best(final, best, config)

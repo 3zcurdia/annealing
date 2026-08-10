@@ -12,7 +12,7 @@ module Annealing
     end
 
     def energy
-      @energy ||= configuration.energy_calculator.call(state)
+      @energy ||= configuration.energy_calculator.call(Annealing::Step.new(self, configuration, 0))
     end
 
     # This method is not idempotent!
@@ -46,7 +46,7 @@ module Annealing
     end
 
     def cool(new_temperature)
-      next_state = configuration.state_change.call(state)
+      next_state = configuration.state_change.call(Annealing::Step.new(self, configuration, 0)).state
       Metal.new(next_state, new_temperature, configuration)
     end
   end

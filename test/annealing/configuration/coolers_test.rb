@@ -14,7 +14,10 @@ module Annealing
 
       def test_linear_cooler_reduces_temperature_linearly
         cooler = @coolers.linear
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:temperature, @temperature)
+        mock_step.expect(:cooling_rate, @cooling_rate)
+        cooled_temp = cooler.call(mock_step)
 
         assert_in_delta @temperature - @cooling_rate,
                         cooled_temp
@@ -22,7 +25,11 @@ module Annealing
 
       def test_exponential_cooler_reduces_temperature_exponentially
         cooler = @coolers.exponential
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:temperature, @temperature)
+        mock_step.expect(:cooling_rate, @cooling_rate)
+        mock_step.expect(:steps, @step)
+        cooled_temp = cooler.call(mock_step)
 
         assert_in_delta @temperature - (Math.exp(@step - 1) * @cooling_rate),
                         cooled_temp
@@ -31,7 +38,11 @@ module Annealing
       def test_geometric_cooler_reduces_temperature_geometrically
         ratio = 3
         cooler = @coolers.geometric(ratio)
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        mock_step = Minitest::Mock.new
+        mock_step.expect(:temperature, @temperature)
+        mock_step.expect(:cooling_rate, @cooling_rate)
+        mock_step.expect(:steps, @step)
+        cooled_temp = cooler.call(mock_step)
 
         assert_in_delta @temperature - (@cooling_rate * (ratio**(@step - 1))),
                         cooled_temp
