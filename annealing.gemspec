@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.summary       = "Simulated Annealing"
-  spec.description   = "Simulated Annealing algoritm implementation."
+  spec.description   = "Simulated Annealing algorithm implementation."
   spec.homepage      = "https://github.com/3zcurdia/annealing"
   spec.required_ruby_version = Gem::Requirement.new(">= 3.4.0")
 

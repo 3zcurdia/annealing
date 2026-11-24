@@ -101,57 +101,64 @@ module Annealing
     def test_validates_temperature_is_not_negative
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
-      assert_raises(@error_class, "Initial temperature cannot be negative") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Initial temperature cannot be negative", error.message
     end
 
     def test_validates_cooling_rate_is_not_negative
       @valid_configuration.validate!
       @valid_configuration.cooling_rate = -0.005
-      assert_raises(@error_class, "Cooling rate cannot be negative") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Cooling rate cannot be negative", error.message
     end
 
     def test_validates_cool_down_funtion_is_callable
       @valid_configuration.validate!
       @valid_configuration.cool_down = nil
-      assert_raises(@error_class, "Missing cool down function") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Missing cool down function", error.message
     end
 
     def test_validates_energy_calculator_is_callable
       @valid_configuration.validate!
-      @valid_configuration.termination_condition = nil
-      assert_raises(@error_class, "Missing energy calculator function") do
+      @valid_configuration.energy_calculator = nil
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Missing energy calculator function", error.message
     end
 
     def test_validates_state_change_is_callable
       @valid_configuration.validate!
-      @valid_configuration.energy_calculator = nil
-      assert_raises(@error_class, "Missing state change function") do
+      @valid_configuration.state_change = nil
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Missing state change function", error.message
     end
 
     def test_validates_termination_condition_is_callable
       @valid_configuration.validate!
-      @valid_configuration.state_change = nil
-      assert_raises(@error_class, "Missing termination condition function") do
+      @valid_configuration.termination_condition = nil
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Missing termination condition function", error.message
     end
 
     def test_validates_return_best
       @valid_configuration.validate!
       @valid_configuration.return_best = nil
-      assert_raises(@error_class, "'Return best' specification must be either true or false") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Return best must be either true or false", error.message
     end
   end
 end

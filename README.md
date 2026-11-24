@@ -92,8 +92,8 @@ Now we can run the simulation. With the default configuration it will consider ~
 optimal_route = Annealing.simulate(locations,
                                    energy_calculator: energy_calculator,
                                    state_change: state_change)
-optimal_route.state
-# => [(20,40), (40,120), (100,120), (60,200), (180,200)]
+optimal_route.map(&:to_a)
+# => [[20, 40], [40, 120], [100, 120], [60, 200], [180, 200]]
 ```
 
 ## Configuration options
@@ -112,7 +112,7 @@ Annealing.configuration.cool_down = Annealing::Configuration::Coolers.linear
 Annealing.configuration.cool_down = Annealing::Configuration::Coolers.exponential
 
 # Use the built-in geometric cool-down function with a custom ratio (default ratio is 2)
-Annealing.configuration.cool_down = Annealing::Configuration::Coolers.exponential(1.5)
+Annealing.configuration.cool_down = Annealing::Configuration::Coolers.geometric(1.5)
 
 # Use a custom cool down function
 Annealing.configuration.cool_down = lambda do |energy, temperature, cooling_rate, steps|
@@ -155,7 +155,7 @@ class PotentialSalesCalculator
     locations.each_cons(2).sum do |location1, location2|
       arrival_time += travel_time(location1, location2, arrival_time)
       distance = location1.distance(location2)
-      potential_sales(locations.first, arrival_time) / distance
+      potential_sales(location2, arrival_time) / distance
     end + first_location_sales
   end
 
@@ -213,9 +213,9 @@ Annealing.configuration.termination_condition = lambda do |_state, energy, tempe
 end
 ```
 
-### 'return_best'
+### `return_best`
 
-If true (the default), will return the best (lowest energy) state seen during the simulation. If false, Simulator#run will return the final state reached when the simulation completes.
+If true, will return the best (lowest energy) state seen during the simulation. If false (the default), `Simulator#run` will return the final state reached when the simulation completes.
 
 ## Configuration precedence
 

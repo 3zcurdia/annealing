@@ -30,9 +30,12 @@ module Annealing
       end
     end
 
-    def lower_energy?(cooled_metal)
+    def energy_greater_than?(cooled_metal)
       cooled_metal.energy < energy
     end
+
+    # DEPRECATED - kept to avoid a breaking change to the public API
+    alias lower_energy? energy_greater_than?
 
     private
 
@@ -40,12 +43,12 @@ module Annealing
     # probability determine if we should accept a higher value over a lower
     # value
     def prefer?(cooled_metal)
-      lower_energy?(cooled_metal) || prefer_despite_higher_energy?(cooled_metal)
+      energy_greater_than?(cooled_metal) || prefer_despite_higher_energy?(cooled_metal)
     end
 
     def prefer_despite_higher_energy?(cooled_metal)
       energy_delta = energy - cooled_metal.energy
-      (Math::E**(energy_delta / cooled_metal.temperature)) > rand
+      Math.exp(energy_delta / cooled_metal.temperature) > rand
     end
 
     def cool(new_temperature)
