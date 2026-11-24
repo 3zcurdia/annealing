@@ -162,7 +162,6 @@ module Annealing
 
       assert_equal :d, final_metal.state
       assert_equal 6, final_metal.energy
-      refute_equal :c, final_metal.state
     end
   end
 end

@@ -39,7 +39,7 @@ state_change = lambda do |state|
   swapped
 end
 
-simulator = Annealing::Simulator.new(temperature: 10_000, cooling_rate: 0.01)
+simulator = Annealing::Simulator.new(temperature: 10_000.0, cooling_rate: 0.01)
 solution = simulator.run(locations,
                          energy_calculator: energy_calculator,
                          state_change: state_change)

@@ -36,10 +36,11 @@ module Annealing
 
       def test_exponential_cooler_reduces_temperature_by_more_on_each_step
         cooler = @coolers.exponential
-        first = @temperature - cooler.call(nil, @temperature, @cooling_rate, 1)
+        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, 1)
+        first = @temperature - cooled_temp
         second = @temperature - cooler.call(nil, @temperature, @cooling_rate, 2)
 
-        assert_in_delta @temperature - @cooling_rate, first
+        assert_in_delta @temperature - @cooling_rate, cooled_temp
         assert_operator second, :>, first
       end
 
