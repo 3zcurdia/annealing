@@ -39,7 +39,7 @@ module Annealing
                    simulator_config.termination_condition
     end
 
-    def test_can_specify_custom_configuration_values_on_initialization
+    def test_can_specify_custom_configuration_values_on_run
       simulator_config = Annealing::Simulator.new(
         cooling_rate: 0.1,
         energy_calculator: ->(_) { 999 },
