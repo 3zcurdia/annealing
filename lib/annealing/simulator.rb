@@ -57,7 +57,7 @@ module Annealing
 
     def final_or_best(final, best, config)
       if config.return_best
-        # preserve the temperature and energy
+        # preserve the final temperature and best energy
         Metal.new(best.state, final.temperature, config, energy: best.energy)
       else
         final
