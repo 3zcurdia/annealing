@@ -110,10 +110,9 @@ module Annealing
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
 
-      error = assert_raises(@error_class) do
+      assert_raises(@error_class, "Initial temperature cannot be negative") do
         @valid_configuration.validate!
       end
-      assert_equal "Initial temperature cannot be negative", error.message
     end
 
     def test_validates_cooling_rate_is_not_negative
