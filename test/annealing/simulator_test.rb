@@ -148,6 +148,10 @@ module Annealing
 
     def test_return_best_does_not_recalculate_energy
       energy_calculator = Minitest::Mock.new
+
+      # The energy calculator is always called n+1 times. (See
+      # test_passes_run_time_configuration_to_metal) We're asserting it's not called an additional
+      # time when checking the energy on the final state when `return_best: true`
       (@total_iterations + 1).times do
         energy_calculator.expect(:call, @fake_energy, [@collection])
       end
