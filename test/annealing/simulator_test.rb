@@ -39,7 +39,7 @@ module Annealing
                    simulator_config.termination_condition
     end
 
-    def test_can_specify_custom_configuration_values_on_run
+    def test_can_specify_custom_configuration_values_on_initialization
       simulator_config = Annealing::Simulator.new(
         cooling_rate: 0.1,
         energy_calculator: ->(_) { 999 },
@@ -57,7 +57,7 @@ module Annealing
                    simulator_config.temperature
     end
 
-    def test_invalid_custom_configuration_values_raise_error_on_initialization
+    def test_invalid_custom_configuration_values_raise_error_on_run
       simulator = Annealing::Simulator.new(
         calculate_energy: ->(_) { 999 },
         change_state: lambda(&:shuffle)
