@@ -21,7 +21,7 @@ module Annealing
           current = reduce_temperature(current, steps, runtime_config)
           # If the current state has lower energy than the previous best (lowest energy) state
           # we've seen so far, the current state is the new best state.
-          best = current if best.lower_energy?(current)
+          best = current if best.energy_greater_than?(current)
         end
         final_or_best(current, best, runtime_config)
       end
@@ -58,8 +58,8 @@ module Annealing
 
     def final_or_best(final, best, config)
       if config.return_best
-        # preserve the temperature
-        Metal.new(best.state, final.temperature, config)
+        # preserve the final temperature and best energy
+        Metal.new(best.state, final.temperature, config, energy: best.energy)
       else
         final
       end

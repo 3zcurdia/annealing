@@ -44,7 +44,7 @@ module Annealing
                 elsif !callable?(energy_calculator)
                   "Missing energy calculator function"
                 elsif ![true, false].include?(return_best)
-                  "'Return best' specification must be either true or false"
+                  "Return best must be either true or false"
                 elsif !callable?(state_change)
                   "Missing state change function"
                 elsif !temperature.is_a?(Float) || !temperature.finite? || temperature.negative?

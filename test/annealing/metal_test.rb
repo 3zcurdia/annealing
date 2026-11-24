@@ -35,6 +35,25 @@ module Annealing
       assert_equal new_temperature, cooled_metal.temperature
     end
 
+    def test_cooled_clamps_negative_temperature_to_zero_float
+      metal = Annealing::Metal.new(@collection, @temperature)
+      cooled_metal = metal.cool!(-0.1)
+
+      assert_instance_of Float, cooled_metal.temperature
+      assert_in_delta(0.0, cooled_metal.temperature)
+    end
+
+    def test_cooled_never_accepts_a_worse_state_when_new_temperature_is_negative
+      config = @global_config.merge(
+        energy_calculator: ->(state) { state }, # energy == current state
+        state_change: ->(_state) { 1_000 }      # proposed state change is always worse
+      )
+      metal = Annealing::Metal.new(0, 1.0, config)
+      cooled_metal = metal.cool!(-1.0)
+
+      assert_in_delta(0.0, cooled_metal.state)
+    end
+
     def test_cooled_calls_state_change_function_with_current_state
       custom_state_changer = Minitest::Mock.new
       custom_state_changer.expect(:call, [], [@collection])

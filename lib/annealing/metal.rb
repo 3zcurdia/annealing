@@ -5,10 +5,13 @@ module Annealing
   class Metal
     attr_reader :configuration, :state, :temperature
 
-    def initialize(current_state, current_temperature, configuration = nil)
+    def initialize(current_state, current_temperature, configuration = nil, energy: nil)
       @configuration = configuration || Annealing.configuration.merge({})
       @state = current_state
       @temperature = current_temperature
+
+      # Used to avoid a potentially costly re-compute when we already know the energy
+      @energy = energy
     end
 
     def energy
@@ -18,6 +21,9 @@ module Annealing
     # This method is not idempotent!
     # It relies on random probability to select the next state
     def cool!(new_temperature)
+      # Clamp the new temperature so it never goes negative
+      new_temperature = [new_temperature, 0.0].max
+
       cooled_metal = cool(new_temperature)
       if prefer?(cooled_metal)
         cooled_metal
@@ -27,9 +33,12 @@ module Annealing
       end
     end
 
-    def lower_energy?(cooled_metal)
+    def energy_greater_than?(cooled_metal)
       cooled_metal.energy < energy
     end
+
+    # DEPRECATED - kept to avoid a breaking change to the public API
+    alias lower_energy? energy_greater_than?
 
     private
 
@@ -37,12 +46,12 @@ module Annealing
     # probability determine if we should accept a higher value over a lower
     # value
     def prefer?(cooled_metal)
-      lower_energy?(cooled_metal) || prefer_despite_higher_energy?(cooled_metal)
+      energy_greater_than?(cooled_metal) || prefer_despite_higher_energy?(cooled_metal)
     end
 
     def prefer_despite_higher_energy?(cooled_metal)
       energy_delta = energy - cooled_metal.energy
-      (Math::E**(energy_delta / cooled_metal.temperature)) > rand
+      Math.exp(energy_delta / cooled_metal.temperature) > rand
     end
 
     def cool(new_temperature)
