@@ -6,10 +6,11 @@ module Annealing
   class ConfigurationTest < Minitest::Test
     def setup
       @subject = Annealing::Configuration
-      @valid_configuration = @subject.new(
+      @valid_configuration_options = {
         energy_calculator: ->(*_args) {},
         state_change: ->(*_args) {}
-      )
+      }
+      @valid_configuration = @subject.new(**@valid_configuration_options)
       @error_class = @subject::ConfigurationError
     end
 
@@ -45,20 +46,6 @@ module Annealing
 
     def test_does_not_set_a_default_state_change_function
       assert_nil @subject.new.state_change
-    end
-
-    def test_forces_cooling_rate_to_float
-      configuration = @subject.new(cooling_rate: 99)
-
-      assert_kind_of Float, configuration.cooling_rate
-      assert_in_delta 99.0, configuration.cooling_rate
-    end
-
-    def test_forces_temperature_to_float
-      configuration = @subject.new(temperature: 999)
-
-      assert_kind_of Float, configuration.temperature
-      assert_in_delta 999.0, configuration.temperature
     end
 
     def test_merge_creates_new_configuration_from_config_hash
@@ -98,19 +85,27 @@ module Annealing
                    new_config.temperature
     end
 
-    def test_validates_temperature_is_not_negative
+    def test_merge_raises_error_unless_options_is_hash
+      error = assert_raises(@error_class) do
+        @valid_configuration.merge(:foo)
+      end
+      assert_equal "Merge options must be a hash", error.message
+    end
+
+    def test_validates_temperature_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
-      error = assert_raises(@error_class) do
+
+      assert_raises(@error_class, "Initial temperature must be a positive float") do
         @valid_configuration.validate!
       end
       assert_equal "Initial temperature cannot be negative", error.message
     end
 
-    def test_validates_cooling_rate_is_not_negative
+    def test_validates_cooling_rate_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.cooling_rate = -0.005
-      error = assert_raises(@error_class) do
+      assert_raises(@error_class, "Cooling rate must be a positive float") do
         @valid_configuration.validate!
       end
       assert_equal "Cooling rate cannot be negative", error.message
@@ -159,6 +154,28 @@ module Annealing
         @valid_configuration.validate!
       end
       assert_equal "Return best must be either true or false", error.message
+    end
+
+    def test_validates_no_unknown_options
+      @invalid_configuration = @subject.new(@valid_configuration_options.merge(
+                                              calculate_energy: ->(*_args) {},
+                                              change_state: ->(*_args) {}
+                                            ))
+
+      error = assert_raises(@error_class) do
+        @invalid_configuration.validate!
+      end
+      assert_equal "Unrecognized configuration options: calculate_energy, change_state", error.message
+    end
+
+    def test_merge_inherits_bad_config_keys_from_base
+      base_configuration = @subject.new(@valid_configuration_options.merge(bad: :key))
+      new_config = base_configuration.merge({})
+
+      error = assert_raises(@error_class) do
+        new_config.validate!
+      end
+      assert_equal "Unrecognized configuration options: bad", error.message
     end
   end
 end

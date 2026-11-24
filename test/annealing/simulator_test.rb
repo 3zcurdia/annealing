@@ -57,6 +57,17 @@ module Annealing
                    simulator_config.temperature
     end
 
+    def test_invalid_custom_configuration_values_raise_error_on_run
+      simulator = Annealing::Simulator.new(
+        calculate_energy: ->(_) { 999 },
+        change_state: lambda(&:shuffle)
+      )
+
+      assert_raises(Configuration::ConfigurationError) do
+        simulator.run(@collection)
+      end
+    end
+
     def test_can_specify_custom_configuration_values_on_run
       termination_condition = lambda { |_state, _energy, temperature|
         temperature == @temperature - 10
@@ -167,7 +178,6 @@ module Annealing
 
       assert_equal :d, final_metal.state
       assert_equal 6, final_metal.energy
-      refute_equal :c, final_metal.state
     end
   end
 end

@@ -32,11 +32,12 @@ module Annealing
 
     # Wrapper for public methods that may use a custom configuration
     def with_runtime_config(config_hash)
-      runtime_config = if config_hash.is_a?(Hash) && config_hash.any?
-                         configuration.merge(config_hash)
-                       else
+      runtime_config = if config_hash.nil?
                          configuration
+                       else
+                         configuration.merge(config_hash)
                        end
+
       runtime_config.validate!
       yield(runtime_config)
     end
