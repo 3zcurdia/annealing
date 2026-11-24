@@ -37,7 +37,9 @@ module Annealing
     end
 
     def validate!
-      message = if !callable?(cool_down)
+      message = if @config_options.any?
+                  "Unrecognized configuration options: #{@config_options.keys.map(&:to_s).sort.join(", ")}"
+                elsif !callable?(cool_down)
                   "Missing cool down function"
                 elsif !cooling_rate.is_a?(Float) || !cooling_rate.finite? || !cooling_rate.positive?
                   "Cooling rate must be a positive float"
@@ -51,8 +53,6 @@ module Annealing
                   "Initial temperature must be a non-negative float"
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
-                elsif @config_options.any?
-                  "Unrecognized configuration options: #{@config_options.keys.map(&:to_s).sort.join(", ")}"
                 end
       raise(ConfigurationError, message) if message
     end

@@ -92,7 +92,7 @@ module Annealing
       assert_equal "Merge options must be a hash", error.message
     end
 
-    def test_validates_temperature_is_positive_float
+    def test_validates_temperature_is_non_negative_float
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
       error = assert_raises(@error_class) do
