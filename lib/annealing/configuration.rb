@@ -52,7 +52,7 @@ module Annealing
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
                 elsif @config_options.any?
-                  "Unrecognized configuration options: #{@config_options.keys.sort.join(", ")}"
+                  "Unrecognized configuration options: #{@config_options.keys.map(&:to_s).sort.join(", ")}"
                 end
       raise(ConfigurationError, message) if message
     end
