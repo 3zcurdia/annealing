@@ -26,7 +26,7 @@ module Annealing
         ratio = ratio.to_f if ratio.is_a?(Integer)
 
         if !ratio.is_a?(Float) || !ratio.finite?
-          raise(ConfigurationError, "Geometric ratio must be a float. ")
+          raise(ConfigurationError, "Geometric ratio must be a float.")
         elsif ratio < 1.0
           raise(ConfigurationError, "A geometric ratio ratio below 1.0 can never reach zero.")
         end
