@@ -26,7 +26,7 @@ module Annealing
       assert_equal 42, metal.energy
     end
 
-    def test_cool_returns_metal_instance_with_new_temperature
+    def test_cooled_returns_metal_instance_with_new_temperature
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.cool!(new_temperature)
@@ -35,7 +35,7 @@ module Annealing
       assert_equal new_temperature, cooled_metal.temperature
     end
 
-    def test_cool_clamps_negative_temperature_to_zero_float
+    def test_cooled_clamps_negative_temperature_to_zero_float
       metal = Annealing::Metal.new(@collection, @temperature)
       cooled_metal = metal.cool!(-0.1)
 
@@ -43,7 +43,7 @@ module Annealing
       assert_in_delta(0.0, cooled_metal.temperature)
     end
 
-    def test_cool_never_accepts_a_worse_state_when_new_temperature_is_negative
+    def test_cooled_never_accepts_a_worse_state_when_new_temperature_is_negative
       config = @global_config.merge(
         energy_calculator: ->(state) { state }, # energy == current state
         state_change: ->(_state) { 1_000 }      # proposed state change is always worse
@@ -54,7 +54,7 @@ module Annealing
       assert_in_delta(0.0, cooled_metal.state)
     end
 
-    def test_cool_calls_state_change_function_with_current_state
+    def test_cooled_calls_state_change_function_with_current_state
       custom_state_changer = Minitest::Mock.new
       custom_state_changer.expect(:call, [], [@collection])
       local_config = @global_config.merge(state_change: custom_state_changer)
@@ -63,7 +63,7 @@ module Annealing
       custom_state_changer.verify
     end
 
-    def test_cool_returns_cooled_metal_when_preferred
+    def test_cooled_returns_cooled_metal_when_preferred
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:prefer?, true) do
@@ -74,7 +74,7 @@ module Annealing
       refute_equal new_temperature, metal.temperature
     end
 
-    def test_cool_returns_the_original_metal_when_not_preferred
+    def test_cooled_returns_the_original_metal_when_not_preferred
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
       cooled_metal = metal.stub(:prefer?, false) do
