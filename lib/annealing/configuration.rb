@@ -20,11 +20,11 @@ module Annealing
     def initialize(config_hash = {})
       @config_options = config_hash.dup
       @cool_down = @config_options.delete(:cool_down) { Coolers.linear }
-      @cooling_rate = @config_options.delete(:cooling_rate) { DEFAULT_COOLING_RATE }.to_f
+      @cooling_rate = @config_options.delete(:cooling_rate) { DEFAULT_COOLING_RATE }
       @energy_calculator = @config_options.delete(:energy_calculator)
       @return_best = @config_options.delete(:return_best) { DEFAULT_RETURN_BEST }
       @state_change = @config_options.delete(:state_change)
-      @temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }.to_f
+      @temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }
       @termination_condition = @config_options.delete(:termination_condition) { Terminators.temp_is_zero? }
     end
 
@@ -38,16 +38,16 @@ module Annealing
     def validate!
       message = if !callable?(cool_down)
                   "Missing cool down function"
-                elsif cooling_rate.negative?
-                  "Cooling rate cannot be negative"
+                elsif !cooling_rate.is_a?(Float) || !cooling_rate.positive?
+                  "Cooling rate must be a positive float"
                 elsif !callable?(energy_calculator)
                   "Missing energy calculator function"
                 elsif ![true, false].include?(return_best)
                   "'Return best' specification must be either true or false"
                 elsif !callable?(state_change)
                   "Missing state change function"
-                elsif temperature.negative?
-                  "Initial temperature cannot be negative"
+                elsif !temperature.is_a?(Float) || !temperature.positive?
+                  "Initial temperature must be a positive float"
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
                 elsif @config_options.any?

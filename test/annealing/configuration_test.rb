@@ -48,20 +48,6 @@ module Annealing
       assert_nil @subject.new.state_change
     end
 
-    def test_forces_cooling_rate_to_float
-      configuration = @subject.new(cooling_rate: 99)
-
-      assert_kind_of Float, configuration.cooling_rate
-      assert_in_delta 99.0, configuration.cooling_rate
-    end
-
-    def test_forces_temperature_to_float
-      configuration = @subject.new(temperature: 999)
-
-      assert_kind_of Float, configuration.temperature
-      assert_in_delta 999.0, configuration.temperature
-    end
-
     def test_merge_creates_new_configuration_from_config_hash
       new_temperature = 3000
       new_config = @valid_configuration.merge(temperature: new_temperature)
@@ -106,19 +92,19 @@ module Annealing
       assert_equal "Merge options must be a hash", error.message
     end
 
-    def test_validates_temperature_is_not_negative
+    def test_validates_temperature_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
 
-      assert_raises(@error_class, "Initial temperature cannot be negative") do
+      assert_raises(@error_class, "Initial temperature must be a positive float") do
         @valid_configuration.validate!
       end
     end
 
-    def test_validates_cooling_rate_is_not_negative
+    def test_validates_cooling_rate_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.cooling_rate = -0.005
-      assert_raises(@error_class, "Cooling rate cannot be negative") do
+      assert_raises(@error_class, "Cooling rate must be a positive float") do
         @valid_configuration.validate!
       end
     end
