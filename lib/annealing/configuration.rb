@@ -26,10 +26,14 @@ module Annealing
       @state_change = @config_options.delete(:state_change)
       @temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }
       @termination_condition = @config_options.delete(:termination_condition) { Terminators.temp_is_zero? }
+
+      # Preserve existing API for integers while protecting against non-numeric values
+      @cooling_rate = @cooling_rate.to_f if @cooling_rate.is_a?(Integer)
+      @temperature = @temperature.to_f if @temperature.is_a?(Integer)
     end
 
     # Return new configuration that merges new attributes with current
-    def merge(config_hash)
+    def merge(config_hash = {})
       raise(ConfigurationError, "Merge options must be a hash") unless config_hash.is_a?(Hash)
 
       self.class.new(attributes.merge(@config_options).merge(config_hash))

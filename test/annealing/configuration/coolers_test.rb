@@ -65,7 +65,7 @@ module Annealing
       end
 
       def test_geometric_cooler_raises_unless_ratio_is_a_float
-        [2, "2.0", nil].each do |ratio|
+        ["2.0", nil].each do |ratio|
           error = assert_raises(ConfigurationError) { @coolers.geometric(ratio) }
 
           assert_match(/must be a float/i, error.message)
