@@ -1,3 +1,16 @@
+## Next
+
+- Fix bug where worse states were always accepted once the temperature went negative (#37)
+- **Potentially breaking:** stricter configuration validation (#40)
+  - Unknown config keys raise `ConfigurationError` instead of being silently ignored
+  - `temperature` and `cooling_rate` must be finite floats (integers are converted); `cooling_rate`
+    must be positive (`0` used to loop forever) and `temperature` non-negative
+  - `Coolers.geometric` requires a finite ratio of at least 1.0
+- Rename `Metal#lower_energy?` to `Metal#energy_greater_than?` (#39)
+- Avoid a redundant `energy_calculator` call when `return_best` is true (#38)
+- Fix README examples and `return_best` default description, and the "algoritm" typo (#39)
+- Bump json to 2.21.2 for a use-after-free fix (#36) and refresh development dependencies
+
 ## [0.4.1] - 2026-07-16
 
 - Add return_best config option. When true, returns the best (lowest energy) state. When false, returns the final state (preserves old behavior).
