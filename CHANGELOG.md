@@ -21,7 +21,7 @@
 - Normalized configurations options such that they can be specified in a consistent way across many interfaces (#19)
 - `Annealing::Pool` has been replaced with `Annealing::Metal` which has a different interface from the old class
 - `Annealing.simulate`, `Annealing::Simulator.new` and `Annealing::Simulator#run` method signatures have changed to accommodate normalized configuration options
-- `Annealing::Simulator.new` no longer raises `RuntimeError` exceptions if configuration options are invalid. Instead, they will be raised from `Annealing::Simulator#run` as `ConfigurationError` exceptions.
+- `Annealing::Simulator.new` no longer raises `RuntimeError` exceptions if configuration options are invalid. Instead, they will be raised from `Annealing::Simulator#run` as `ArgumentError` exceptions.
 - Negative `cooling_rate` values are no longer valid; `Annealing::Simulator#run` will raise an error if one is specified
 - Comprehensive test suite added
 
