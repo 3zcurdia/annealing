@@ -31,6 +31,9 @@ module Annealing
       cooled_metal.energy < energy
     end
 
+    # DEPRECATED - kept to avoid a breaking change to the public API
+    alias lower_energy? energy_greater_than?
+
     private
 
     # True if cooled_metal.energy is lower than current energy, otherwise let
