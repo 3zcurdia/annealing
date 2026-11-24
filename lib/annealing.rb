@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Simulated Annealing algoritm
+# Simulated Annealing algorithm
 # https://en.wikipedia.org/wiki/Simulated_annealing
 module Annealing
   # Default error class

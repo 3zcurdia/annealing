@@ -21,7 +21,7 @@ module Annealing
           current = reduce_temperature(current, steps, runtime_config)
           # If the current state has lower energy than the previous best (lowest energy) state
           # we've seen so far, the current state is the new best state.
-          best = current if best.lower_energy?(current)
+          best = current if best.energy_greater_than?(current)
         end
         final_or_best(current, best, runtime_config)
       end
