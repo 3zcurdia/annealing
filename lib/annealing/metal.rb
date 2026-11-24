@@ -5,10 +5,13 @@ module Annealing
   class Metal
     attr_reader :configuration, :state, :temperature
 
-    def initialize(current_state, current_temperature, configuration = nil)
+    def initialize(current_state, current_temperature, configuration = nil, energy: nil)
       @configuration = configuration || Annealing.configuration.merge({})
       @state = current_state
       @temperature = current_temperature
+
+      # Used to avoid a potentially costly re-compute when we already know the energy
+      @energy = energy
     end
 
     def energy
