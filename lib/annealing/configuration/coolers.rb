@@ -21,10 +21,11 @@ module Annealing
       end
 
       # Reduce temperature geometrically at a given ratio by the cooling rate
-      def geometric(ratio = 2)
-        unless ratio.positive?
-          raise(Annealing::Configuration::ConfigurationError,
-                "geometric ratio must be positive")
+      def geometric(ratio = 2.0)
+        if !ratio.is_a?(Float)
+          raise(ConfigurationError, "Geometric ratio must be a float. ")
+        elsif ratio < 1.0
+          raise(ConfigurationError, "A geometric ratio ratio below 1.0 can never reach zero.")
         end
 
         lambda { |_energy, temperature, cooling_rate, steps|
