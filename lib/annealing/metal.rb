@@ -21,6 +21,9 @@ module Annealing
     # This method is not idempotent!
     # It relies on random probability to select the next state
     def cool!(new_temperature)
+      # Clamp the new temperature so it never goes negative
+      new_temperature = [new_temperature, 0.0].max
+
       cooled_metal = cool(new_temperature)
       if prefer?(cooled_metal)
         cooled_metal

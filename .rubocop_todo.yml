@@ -16,11 +16,12 @@ Metrics/AbcSize:
     - 'test/annealing/simulator_test.rb'
     - 'test/annealing_test.rb'
 
-# Offense count: 2
+# Offense count: 3
 # Configuration parameters: CountComments, Max, CountAsOne.
 Metrics/ClassLength:
   Exclude:
     - 'test/annealing/configuration_test.rb'
+    - 'test/annealing/metal_test.rb'
     - 'test/annealing/simulator_test.rb'
 
 # Offense count: 1
