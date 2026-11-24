@@ -18,21 +18,21 @@ module Annealing
                   :termination_condition
 
     def initialize(config_hash = {})
-      @cool_down = config_hash.fetch(:cool_down, Coolers.linear)
-      @cooling_rate = config_hash.fetch(:cooling_rate,
-                                        DEFAULT_COOLING_RATE).to_f
-      @energy_calculator = config_hash.fetch(:energy_calculator, nil)
-      @return_best = config_hash.fetch(:return_best, DEFAULT_RETURN_BEST)
-      @state_change = config_hash.fetch(:state_change, nil)
-      @temperature  = config_hash.fetch(:temperature,
-                                        DEFAULT_INITIAL_TEMPERATURE).to_f
-      @termination_condition = config_hash.fetch(:termination_condition,
-                                                 Terminators.temp_is_zero?)
+      @config_options = config_hash.dup
+      @cool_down = @config_options.delete(:cool_down) { Coolers.linear }
+      @cooling_rate = @config_options.delete(:cooling_rate) { DEFAULT_COOLING_RATE }.to_f
+      @energy_calculator = @config_options.delete(:energy_calculator)
+      @return_best = @config_options.delete(:return_best) { DEFAULT_RETURN_BEST }
+      @state_change = @config_options.delete(:state_change)
+      @temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }.to_f
+      @termination_condition = @config_options.delete(:termination_condition) { Terminators.temp_is_zero? }
     end
 
     # Return new configuration that merges new attributes with current
     def merge(config_hash)
-      self.class.new(attributes.merge(config_hash))
+      raise(ConfigurationError, "Merge options must be a hash") unless config_hash.is_a?(Hash)
+
+      self.class.new(attributes.merge(@config_options).merge(config_hash))
     end
 
     def validate!
@@ -50,6 +50,8 @@ module Annealing
                   "Initial temperature cannot be negative"
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
+                elsif @config_options.any?
+                  "Unrecognized configuration options: #{@config_options.keys.sort.join(", ")}"
                 end
       raise(ConfigurationError, message) if message
     end

@@ -6,10 +6,11 @@ module Annealing
   class ConfigurationTest < Minitest::Test
     def setup
       @subject = Annealing::Configuration
-      @valid_configuration = @subject.new(
+      @valid_configuration_options = {
         energy_calculator: ->(*_args) {},
         state_change: ->(*_args) {}
-      )
+      }
+      @valid_configuration = @subject.new(**@valid_configuration_options)
       @error_class = @subject::ConfigurationError
     end
 
@@ -98,12 +99,21 @@ module Annealing
                    new_config.temperature
     end
 
+    def test_merge_raises_error_unless_options_is_hash
+      error = assert_raises(@error_class) do
+        @valid_configuration.merge(:foo)
+      end
+      assert_equal "Merge options must be a hash", error.message
+    end
+
     def test_validates_temperature_is_not_negative
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
-      assert_raises(@error_class, "Initial temperature cannot be negative") do
+
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
+      assert_equal "Initial temperature cannot be negative", error.message
     end
 
     def test_validates_cooling_rate_is_not_negative
@@ -152,6 +162,28 @@ module Annealing
       assert_raises(@error_class, "'Return best' specification must be either true or false") do
         @valid_configuration.validate!
       end
+    end
+
+    def test_validates_no_unknown_options
+      @invalid_configuration = @subject.new(@valid_configuration_options.merge(
+                                              calculate_energy: ->(*_args) {},
+                                              change_state: ->(*_args) {}
+                                            ))
+
+      error = assert_raises(@error_class) do
+        @invalid_configuration.validate!
+      end
+      assert_equal "Unrecognized configuration options: calculate_energy, change_state", error.message
+    end
+
+    def test_merge_inherits_bad_config_keys_from_base
+      base_configuration = @subject.new(@valid_configuration_options.merge(bad: :key))
+      new_config = base_configuration.merge({})
+
+      error = assert_raises(@error_class) do
+        new_config.validate!
+      end
+      assert_equal "Unrecognized configuration options: bad", error.message
     end
   end
 end
