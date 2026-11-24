@@ -39,7 +39,7 @@ module Annealing
     def validate!
       message = if !callable?(cool_down)
                   "Missing cool down function"
-                elsif !cooling_rate.is_a?(Float) || !cooling_rate.positive?
+                elsif !cooling_rate.is_a?(Float) || !cooling_rate.finite? || !cooling_rate.positive?
                   "Cooling rate must be a positive float"
                 elsif !callable?(energy_calculator)
                   "Missing energy calculator function"
@@ -47,7 +47,7 @@ module Annealing
                   "'Return best' specification must be either true or false"
                 elsif !callable?(state_change)
                   "Missing state change function"
-                elsif !temperature.is_a?(Float) || temperature.negative?
+                elsif !temperature.is_a?(Float) || !temperature.finite? || temperature.negative?
                   "Initial temperature must be a non-negative float"
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
