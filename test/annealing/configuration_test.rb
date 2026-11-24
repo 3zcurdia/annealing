@@ -95,20 +95,19 @@ module Annealing
     def test_validates_temperature_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.temperature = -100
-
-      assert_raises(@error_class, "Initial temperature must be a positive float") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
-      assert_equal "Initial temperature cannot be negative", error.message
+      assert_equal "Initial temperature must be a non-negative float", error.message
     end
 
     def test_validates_cooling_rate_is_positive_float
       @valid_configuration.validate!
       @valid_configuration.cooling_rate = -0.005
-      assert_raises(@error_class, "Cooling rate must be a positive float") do
+      error = assert_raises(@error_class) do
         @valid_configuration.validate!
       end
-      assert_equal "Cooling rate cannot be negative", error.message
+      assert_equal "Cooling rate must be a positive float", error.message
     end
 
     def test_validates_cool_down_funtion_is_callable
