@@ -14,7 +14,7 @@ class AnnealingTest < Minitest::Test
   def test_returns_the_annealed_state_using_the_default_config
     custom_temperature = 1000
     custom_cooling_rate = 1
-    total_iterations = (custom_temperature / custom_cooling_rate).floor
+    total_iterations = custom_temperature / custom_cooling_rate
     collection = (1..10).to_a.shuffle
     global_energy_calculator = Minitest::Mock.new
     global_state_changer = Minitest::Mock.new
