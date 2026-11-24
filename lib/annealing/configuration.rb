@@ -10,26 +10,23 @@ module Annealing
     class ConfigurationError < Annealing::Error; end
 
     attr_accessor :cool_down,
-                  :cooling_rate,
                   :energy_calculator,
                   :return_best,
                   :state_change,
-                  :temperature,
                   :termination_condition
+
+    attr_reader :cooling_rate, :temperature
 
     def initialize(config_hash = {})
       @config_options = config_hash.dup
       @cool_down = @config_options.delete(:cool_down) { Coolers.linear }
-      @cooling_rate = @config_options.delete(:cooling_rate) { DEFAULT_COOLING_RATE }
       @energy_calculator = @config_options.delete(:energy_calculator)
       @return_best = @config_options.delete(:return_best) { DEFAULT_RETURN_BEST }
       @state_change = @config_options.delete(:state_change)
-      @temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }
       @termination_condition = @config_options.delete(:termination_condition) { Terminators.temp_is_zero? }
 
-      # Preserve existing API for integers while protecting against non-numeric values
-      @cooling_rate = @cooling_rate.to_f if @cooling_rate.is_a?(Integer)
-      @temperature = @temperature.to_f if @temperature.is_a?(Integer)
+      self.cooling_rate = @config_options.delete(:cooling_rate) { DEFAULT_COOLING_RATE }
+      self.temperature  = @config_options.delete(:temperature) { DEFAULT_INITIAL_TEMPERATURE }
     end
 
     # Return new configuration that merges new attributes with current
@@ -50,14 +47,26 @@ module Annealing
                   "'Return best' specification must be either true or false"
                 elsif !callable?(state_change)
                   "Missing state change function"
-                elsif !temperature.is_a?(Float) || !temperature.positive?
-                  "Initial temperature must be a positive float"
+                elsif !temperature.is_a?(Float) || temperature.negative?
+                  "Initial temperature must be a non-negative float"
                 elsif !callable?(termination_condition)
                   "Missing termination condition function"
                 elsif @config_options.any?
                   "Unrecognized configuration options: #{@config_options.keys.sort.join(", ")}"
                 end
       raise(ConfigurationError, message) if message
+    end
+
+    # Preserve existing API for integers while protecting against non-numeric values
+    def cooling_rate=(new_value)
+      @cooling_rate = new_value
+      @cooling_rate = @cooling_rate.to_f if @cooling_rate.is_a?(Integer)
+    end
+
+    # Preserve existing API for integers while protecting against non-numeric values
+    def temperature=(new_value)
+      @temperature = new_value
+      @temperature = @temperature.to_f if @temperature.is_a?(Integer)
     end
 
     private
