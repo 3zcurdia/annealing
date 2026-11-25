@@ -111,7 +111,7 @@ Each of the custom functions described below (`cool_down`, `energy_calculator`, 
 - `cooling_rate` — the `cooling_rate` in effect for this simulation
 - `steps` — the number of steps the annealer has taken so far (`0` for the initial state)
 
-Within one pass of the simulation, `termination_condition` and `state_change` see the count of completed steps, while `cool_down` sees the count including the step it is about to perform.
+Within one pass of the simulation, `termination_condition` and `state_change` see the count of completed steps, while `cool_down` sees the count including the step it is about to perform. The count advances on every step, whether or not the proposed state is accepted.
 
 ### `cool_down`
 
@@ -156,6 +156,8 @@ Generally speaking, simulations have a higher chance of finding optimal solution
 You must specify a `energy_calculator` function before running any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state` to access the state being measured. It should return a measurement representing the efficiency of the current state based on all of its competing factors, and where a lower value represents a better configuration than a higher value.
 
 Note: avoid calling `step.energy` inside your `energy_calculator`. It re-enters the calculator to compute the energy, which will raise a `SystemStackError`. Use `step.state` to compute the energy instead.
+
+Note: once the temperature reaches zero, the annealer only accepts a proposed state when it has a strictly lower energy. A proposed state with an equal or higher energy is never accepted at that point.
 
 ```ruby
 # A custom calculator class that takes into account hypothetical external factors

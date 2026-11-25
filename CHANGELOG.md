@@ -1,5 +1,12 @@
 ## Next
 
+- Fix bug where the `state_change` function received a stale step count. The count now advances
+  on every step, whether or not the proposed state is accepted, so it matches the count seen by
+  the `termination_condition` function (and the README).
+- Fix bug where an equal-energy state was accepted or rejected depending on whether the
+  temperature had reached exactly zero. At zero temperature only strictly lower-energy states
+  are accepted now.
+- Avoid re-computing the energy when the `energy_calculator` returns `nil`
 - Fix bug where worse states were always accepted once the temperature went negative (#37)
 - **Potentially breaking:** stricter configuration validation (#40)
   - Unknown config keys raise `ConfigurationError` instead of being silently ignored

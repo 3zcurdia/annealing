@@ -13,5 +13,4 @@ group :development do
   gem "rubocop-minitest", "~> 0.37"
   gem "rubocop-performance", "~> 1.25"
   gem "rubocop-rake", "~> 0.7"
-  gem "ruby-prof", "~> 1.7", ">= 1.7.0"
 end

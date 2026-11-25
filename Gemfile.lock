@@ -7,7 +7,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
-    base64 (0.3.0)
     debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -73,8 +72,6 @@ GEM
     rubocop-rake (0.7.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1)
-    ruby-prof (1.7.2)
-      base64
     ruby-progressbar (1.13.0)
     tsort (0.2.0)
     unicode-display_width (3.3.0)
@@ -93,7 +90,6 @@ DEPENDENCIES
   rubocop-minitest (~> 0.37)
   rubocop-performance (~> 1.25)
   rubocop-rake (~> 0.7)
-  ruby-prof (~> 1.7, >= 1.7.0)
 
 BUNDLED WITH
    2.7.2

@@ -35,4 +35,48 @@ class AnnealingTest < Minitest::Test
     global_energy_calculator.verify
     global_state_changer.verify
   end
+
+  def test_simulate_returns_the_annealed_state
+    collection = (1..10).to_a
+    Annealing.configure do |config|
+      config.temperature = 10
+      config.cooling_rate = 1
+      config.energy_calculator = ->(step) { step.state.sum }
+      config.state_change = lambda(&:state)
+    end
+
+    state = Annealing.simulate(collection)
+
+    assert_equal collection, state
+    refute_instance_of Annealing::Metal, state
+  end
+
+  def test_configure_returns_the_configuration
+    config = Annealing.configure { |configuration| configuration.temperature = 42 }
+
+    assert_instance_of Annealing::Configuration, config
+    assert_in_delta 42.0, config.temperature
+  end
+
+  def test_setting_the_configuration_to_nil_resets_it_to_the_defaults
+    Annealing.configure { |config| config.temperature = 42 }
+    Annealing.configuration = nil
+
+    assert_in_delta Annealing::Configuration::DEFAULT_INITIAL_TEMPERATURE,
+                    Annealing.configuration.temperature
+  end
+
+  def test_configuration_errors_are_annealing_errors
+    error = assert_raises(Annealing::Error) do
+      Annealing::Configuration.new(
+        energy_calculator: ->(_) {},
+        state_change: ->(_) {}
+      ).tap do |config|
+        config.cool_down = nil
+        config.validate!
+      end
+    end
+
+    assert_instance_of Annealing::Configuration::ConfigurationError, error
+  end
 end

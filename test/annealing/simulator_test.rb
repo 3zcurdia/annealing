@@ -201,5 +201,86 @@ module Annealing
       assert_equal %i[cool_down energy_calculator state_change termination_condition], received.keys.sort
       received.each_value { |classes| assert_equal [Annealing::Step], classes.uniq }
     end
+
+    def test_custom_functions_receive_the_documented_step_counts
+      seen = { cool_down: [], state_change: [], termination_condition: [] }
+      @simulator.run(@collection,
+                     cool_down: lambda do |step|
+                       seen[:cool_down] << step.steps
+                       step.temperature - 1
+                     end,
+                     state_change: lambda do |step|
+                       seen[:state_change] << step.steps
+                       step.state
+                     end,
+                     termination_condition: lambda do |step|
+                       seen[:termination_condition] << step.steps
+                       step.temperature <= 0
+                     end)
+
+      # The termination condition and the state change see the number of
+      # completed steps, while the cool down function sees the number of
+      # steps including the one it is about to perform.
+      assert_equal (0..@total_iterations).to_a, seen[:termination_condition]
+      assert_equal (0...@total_iterations).to_a, seen[:state_change]
+      assert_equal (1..@total_iterations).to_a, seen[:cool_down]
+    end
+
+    def test_run_with_a_nil_configuration_hash_uses_the_simulator_configuration
+      state = @simulator.run(@collection, nil)
+
+      assert_in_delta 0.0, state.temperature
+    end
+
+    def test_run_stops_immediately_when_the_termination_condition_is_already_met
+      calls = 0
+      state = @simulator.run(@collection,
+                             energy_calculator: ->(_step) { calls += 1 },
+                             termination_condition: ->(_step) { true })
+
+      assert_equal @collection, state.state
+      assert_equal @temperature, state.temperature
+      assert_equal 0, calls
+    end
+
+    def test_run_with_return_best_computes_the_energy_when_no_steps_are_taken
+      calls = 0
+      state = @simulator.run(@collection,
+                             energy_calculator: lambda do |_step|
+                               calls += 1
+                               @fake_energy
+                             end,
+                             termination_condition: ->(_step) { true },
+                             return_best: true)
+
+      assert_equal @collection, state.state
+      assert_equal @fake_energy, state.energy
+      assert_equal 1, calls
+    end
+
+    def test_instance_configuration_overrides_global_configuration
+      simulator = Annealing::Simulator.new(temperature: 500)
+      initial_temperatures = []
+      simulator.run(@collection,
+                    termination_condition: lambda do |step|
+                      initial_temperatures << step.temperature
+                      step.temperature <= 0
+                    end)
+
+      assert_in_delta 500.0, initial_temperatures.first
+    end
+
+    def test_just_in_time_configuration_overrides_instance_and_global_configuration
+      simulator = Annealing::Simulator.new(temperature: 500)
+      initial_temperatures = []
+      simulator.run(@collection,
+                    temperature: 100,
+                    termination_condition: lambda do |step|
+                      initial_temperatures << step.temperature
+                      step.temperature <= 0
+                    end)
+
+      assert_in_delta 100.0, initial_temperatures.first
+    end
   end
 end

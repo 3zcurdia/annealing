@@ -82,6 +82,60 @@ module Annealing
       assert_equal 1, cooled_metal.iteration
     end
 
+    def test_cool_increments_the_iteration_count_when_the_new_state_is_rejected
+      metal = Annealing::Metal.new(@collection, @temperature)
+      cooled_metal = metal.stub(:prefer?, false) { metal.cool!(@temperature) }
+
+      assert_same metal, cooled_metal
+      assert_equal 1, cooled_metal.iteration
+    end
+
+    def test_state_change_receives_the_number_of_completed_steps
+      seen_steps = []
+      config = @global_config.merge(
+        state_change: lambda do |step|
+          seen_steps << step.steps
+          step.state
+        end
+      )
+      metal = Annealing::Metal.new(@collection, @temperature, config)
+      metal.stub(:prefer?, false) { metal.cool!(@temperature) }
+      metal.stub(:prefer?, false) { metal.cool!(@temperature) }
+
+      assert_equal [0, 1], seen_steps
+    end
+
+    def test_energy_can_be_provided_on_initialization
+      calls = 0
+      config = @global_config.merge(energy_calculator: ->(_step) { calls += 1 })
+      metal = Annealing::Metal.new(@collection, @temperature, config, energy: 99)
+
+      assert_equal 99, metal.energy
+      assert_equal 0, calls
+    end
+
+    def test_iteration_can_be_provided_on_initialization
+      metal = Annealing::Metal.new(@collection, @temperature, nil, iteration: 7)
+
+      assert_equal 7, metal.iteration
+    end
+
+    def test_energy_is_only_calculated_once_even_when_the_calculator_returns_nil
+      calls = 0
+      config = @global_config.merge(
+        energy_calculator: lambda do |_step|
+          calls += 1
+          nil
+        end
+      )
+      metal = Annealing::Metal.new(@collection, @temperature, config)
+
+      metal.energy
+      metal.energy
+
+      assert_equal 1, calls
+    end
+
     def test_cooled_returns_cooled_metal_when_preferred
       metal = Annealing::Metal.new(@collection, @temperature)
       new_temperature = @temperature - 1
@@ -158,6 +212,42 @@ module Annealing
           metal.stub(:rand, probability) do
             refute metal.send(:prefer?, cooled_metal)
           end
+        end
+      end
+    end
+
+    def test_prefer_true_when_the_energies_are_equal_and_the_temperature_is_above_zero
+      config = @global_config.merge(energy_calculator: ->(_step) { @current_energy })
+      metal = Annealing::Metal.new(@collection, @temperature, config)
+      cooled_metal = Annealing::Metal.new(@collection.shuffle, @temperature, config)
+
+      assert metal.send(:prefer?, cooled_metal)
+    end
+
+    def test_prefer_false_when_the_energies_are_equal_and_the_temperature_is_zero
+      config = @global_config.merge(energy_calculator: ->(_step) { @current_energy })
+      metal = Annealing::Metal.new(@collection, 0.0, config)
+      cooled_metal = Annealing::Metal.new(@collection.shuffle, 0.0, config)
+
+      refute metal.send(:prefer?, cooled_metal)
+    end
+
+    def test_cooled_does_not_accept_an_equal_state_at_zero_temperature
+      config = @global_config.merge(state_change: lambda(&:state))
+      metal = Annealing::Metal.new(@collection, 1.0, config)
+      cooled_metal = metal.cool!(0.0)
+
+      assert_same metal, cooled_metal
+      assert_equal @collection, cooled_metal.state
+    end
+
+    def test_lower_energy_is_an_alias_of_energy_greater_than
+      metal = Annealing::Metal.new(@collection, @temperature)
+      cooled_metal = Annealing::Metal.new(@collection.shuffle, @temperature)
+      metal.stub(:energy, @current_energy) do
+        cooled_metal.stub(:energy, @current_energy / 2) do
+          assert metal.lower_energy?(cooled_metal)
+          assert metal.energy_greater_than?(cooled_metal)
         end
       end
     end

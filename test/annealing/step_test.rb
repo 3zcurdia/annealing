@@ -28,5 +28,14 @@ module Annealing
       refute_respond_to @step, :metal
       refute_respond_to @step, :configuration
     end
+
+    def test_energy_raises_a_system_stack_error_when_called_from_the_energy_calculator
+      configuration = Annealing::Configuration.new(
+        energy_calculator: lambda(&:energy)
+      )
+      metal = Annealing::Metal.new(@state, 100.0, configuration)
+
+      assert_raises(SystemStackError) { metal.energy }
+    end
   end
 end

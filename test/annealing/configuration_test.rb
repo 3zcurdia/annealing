@@ -48,6 +48,25 @@ module Annealing
       assert_nil @subject.new.state_change
     end
 
+    def test_does_not_return_the_best_state_by_default
+      refute @subject::DEFAULT_RETURN_BEST
+      refute @subject.new.return_best
+    end
+
+    def test_converts_an_integer_cooling_rate_to_a_float
+      config = @subject.new(cooling_rate: 5)
+
+      assert_in_delta 5.0, config.cooling_rate
+      assert_instance_of Float, config.cooling_rate
+    end
+
+    def test_converts_an_integer_temperature_to_a_float
+      config = @subject.new(temperature: 100)
+
+      assert_in_delta 100.0, config.temperature
+      assert_instance_of Float, config.temperature
+    end
+
     def test_merge_creates_new_configuration_from_config_hash
       new_temperature = 3000
       new_config = @valid_configuration.merge(temperature: new_temperature)

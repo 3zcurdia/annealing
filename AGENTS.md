@@ -18,8 +18,8 @@ simulated annealing. See `README.md` for the public API and configuration preced
 - `rake`'s default task includes `bin/run` via the `end_to_end_test` task. It runs a
   real (slow, non-deterministic due to `rand`) annealing simulation; skip it with
   `rake test rubocop` when you only want fast feedback.
-- Tests use Minitest. `test/test_helper.rb` requires `ruby-prof` and `debug` — both are
-  dev deps in the `Gemfile`; ensure they're installed (`bundle install`) before running tests.
+- Tests use Minitest. `test/test_helper.rb` requires `debug` — a dev dep in the `Gemfile`;
+  ensure it's installed (`bundle install`) before running tests.
 - `Annealing.configuration` is a global singleton. Tests reset it in
   `Minitest::Test#teardown` by setting `Annealing.configuration = nil`. When writing
   tests that touch global config, favor scoped instance/JIT config or rely on teardown.

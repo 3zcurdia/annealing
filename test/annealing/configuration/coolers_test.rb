@@ -64,6 +64,13 @@ module Annealing
         assert_in_delta explicit, default
       end
 
+      def test_geometric_cooler_converts_an_integer_ratio_to_a_float
+        integer_ratio = @coolers.geometric(3).call(build_step(@temperature, @step))
+        float_ratio = @coolers.geometric(3.0).call(build_step(@temperature, @step))
+
+        assert_in_delta float_ratio, integer_ratio
+      end
+
       def test_geometric_cooler_raises_unless_ratio_is_a_float
         ["2.0", nil].each do |ratio|
           error = assert_raises(ConfigurationError) { @coolers.geometric(ratio) }
