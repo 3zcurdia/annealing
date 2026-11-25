@@ -1,3 +1,11 @@
+## [Unreleased]
+
+- BREAKING: normalize the custom function interfaces (closes #17). The
+  `energy_calculator`, `state_change`, `cool_down`, and `termination_condition`
+  functions now each receive a single `Annealing::Step` argument instead of
+  their previous positional arguments. See the README for the new signatures.
+  Thanks to @webbrain-one for the original implementation in #35.
+
 ## [0.4.1] - 2026-07-16
 
 - Add return_best config option. When true, returns the best (lowest energy) state. When false, returns the final state (preserves old behavior).

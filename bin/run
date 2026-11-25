@@ -24,13 +24,18 @@ locations = [
   Location.new("Allentown", 20, 40)
 ].shuffle
 
-energy_calculator = lambda do |state|
+distance_energy = lambda do |state|
   state.each_cons(2).sum do |location1, location2|
     location1.distance(location2)
   end
 end
 
-state_change = lambda do |state|
+energy_calculator = lambda do |step|
+  distance_energy.call(step.state)
+end
+
+state_change = lambda do |step|
+  state = step.state
   size = state.size
   swapped = state.dup
   idx_a = rand(size)
@@ -44,7 +49,7 @@ solution = simulator.run(locations,
                          energy_calculator: energy_calculator,
                          state_change: state_change)
 
-initial_energy = energy_calculator.call(locations)
+initial_energy = distance_energy.call(locations)
 puts "\nInitial itinerary:"
 locations.each_cons(2).with_index do |(location1, location2), index|
   puts "Stop ##{index + 1}: #{location1.name} -> #{location2.name} (#{location1.distance(location2)})"

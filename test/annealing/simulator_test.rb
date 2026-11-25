@@ -15,7 +15,7 @@ module Annealing
       @global_config = Annealing.configure do |config|
         config.cooling_rate = @cooling_rate
         config.energy_calculator = ->(_) { @fake_energy }
-        config.state_change = ->(state) { state }
+        config.state_change = lambda(&:state)
         config.temperature = @temperature
       end
 
@@ -43,7 +43,7 @@ module Annealing
       simulator_config = Annealing::Simulator.new(
         cooling_rate: 0.1,
         energy_calculator: ->(_) { 999 },
-        state_change: lambda(&:shuffle),
+        state_change: ->(step) { step.state.shuffle },
         temperature: 99
       ).configuration
 
@@ -69,8 +69,8 @@ module Annealing
     end
 
     def test_can_specify_custom_configuration_values_on_run
-      termination_condition = lambda { |_state, _energy, temperature|
-        temperature == @temperature - 10
+      termination_condition = lambda { |step|
+        step.temperature == @temperature - 10
       }
       state = @simulator.run(@collection,
                              termination_condition: termination_condition)
@@ -87,46 +87,47 @@ module Annealing
     end
 
     def test_runs_simulation_until_termination_condition_is_met
-      termination_condition = Minitest::Mock.new
-      @total_iterations.times do |step|
-        current_temp = @temperature - (@cooling_rate * step)
-        termination_condition.expect(:call, false, [@collection,
-                                                    @fake_energy,
-                                                    current_temp])
+      seen_temperatures = []
+      termination_condition = lambda do |step|
+        seen_temperatures << step.temperature
+        step.temperature <= 0
       end
       final_temp = @temperature - (@cooling_rate * @total_iterations)
-      termination_condition.expect(:call, true, [@collection,
-                                                 @fake_energy,
-                                                 final_temp])
       state = @simulator.run(@collection,
                              termination_condition: termination_condition)
 
       assert_equal final_temp, state.temperature
-      termination_condition.verify
+      expected_temperatures = (0..@total_iterations).map do |step|
+        @temperature - (@cooling_rate * step)
+      end
+
+      assert_equal expected_temperatures, seen_temperatures
     end
 
     def test_uses_cool_down_function_to_reduce_temperature_at_each_step
-      cool_down = Minitest::Mock.new
-      @total_iterations.times do |step|
-        current_temp = @temperature - (@cooling_rate * step)
-        new_temp = @temperature - ((@cooling_rate * step) + 1)
-        cool_down.expect(:call, new_temp, [@fake_energy, current_temp,
-                                           @cooling_rate, step + 1])
+      seen = []
+      cool_down = lambda do |step|
+        seen << [step.temperature, step.cooling_rate, step.steps]
+        step.temperature - 1
       end
       state = @simulator.run(@collection, cool_down: cool_down)
 
       assert_equal 0, state.temperature
-      cool_down.verify
+      expected = Array.new(@total_iterations) do |step|
+        [@temperature - (@cooling_rate * step), @cooling_rate, step + 1]
+      end
+
+      assert_equal expected, seen
     end
 
     def test_passes_run_time_configuration_to_metal
       energy_calculator = Minitest::Mock.new
       state_changer = Minitest::Mock.new
       @total_iterations.times do
-        energy_calculator.expect(:call, @fake_energy, [@collection])
-        state_changer.expect(:call, @collection, [@collection])
+        energy_calculator.expect(:call, @fake_energy) { |step| step.state == @collection }
+        state_changer.expect(:call, @collection) { |step| step.state == @collection }
       end
-      energy_calculator.expect(:call, @fake_energy, [@collection])
+      energy_calculator.expect(:call, @fake_energy) { |step| step.state == @collection }
 
       @simulator.run(@collection,
                      energy_calculator: energy_calculator,
@@ -142,10 +143,10 @@ module Annealing
 
       Kernel.stub(:rand, 0.0) do
         @simulator.run(:a,
-                       energy_calculator: ->(s) { energies.fetch(s) },
-                       state_change: ->(_) { state_sequence.next },
-                       cool_down: ->(_energy, temp, _rate, _step) { temp - 1 },
-                       termination_condition: ->(_s, _e, _t) { (call_count += 1) >= 4 },
+                       energy_calculator: ->(step) { energies.fetch(step.state) },
+                       state_change: ->(_step) { state_sequence.next },
+                       cool_down: ->(step) { step.temperature - 1 },
+                       termination_condition: ->(_step) { (call_count += 1) >= 4 },
                        return_best: return_best)
       end
     end
@@ -164,7 +165,7 @@ module Annealing
       # test_passes_run_time_configuration_to_metal) We're asserting it's not called an additional
       # time when checking the energy on the final state when `return_best: true`
       (@total_iterations + 1).times do
-        energy_calculator.expect(:call, @fake_energy, [@collection])
+        energy_calculator.expect(:call, @fake_energy) { |step| step.state == @collection }
       end
 
       state = @simulator.run(@collection, energy_calculator: energy_calculator, return_best: true)

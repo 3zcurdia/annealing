@@ -66,8 +66,8 @@ locations = [
 Next we need a way to calculate the total energy of traveling to each location in turn, with low energy states preferable to high energy states. Think of it as a representation of the efficiency of the trip; the further away one point is away from the next, the less efficient the trip is.
 
 ```ruby
-energy_calculator = lambda do |locations|
-  locations.each_cons(2).sum do |location1, location2|
+energy_calculator = lambda do |step|
+  step.state.each_cons(2).sum do |location1, location2|
     location1.distance(location2)
   end
 end
@@ -76,7 +76,8 @@ end
 Finally, we need a way to make small, random changes in the order of locations the salesperson will visit as we probe for an optimal route.
 
 ```ruby
-state_change = lambda do |locations|
+state_change = lambda do |step|
+  locations = step.state
   size = locations.size
   swapped = locations.dup
   idx_a = rand(size)
@@ -100,9 +101,21 @@ optimal_route.map(&:to_a)
 
 The annealer supports a number of configuration options. See the [configuration precedence](#configuration-precedence) section below for information on the different scopes they can be applied to.
 
+### The step object
+
+Each of the custom functions described below (`cool_down`, `energy_calculator`, `state_change`, and `termination_condition`) accepts a single argument: an `Annealing::Step` snapshot of the current iteration of the simulation. It exposes the following read-only methods:
+
+- `state` — the current state of the `Metal` being evaluated
+- `energy` — the energy calculation of the current state
+- `temperature` — the current temperature of the annealer
+- `cooling_rate` — the `cooling_rate` in effect for this simulation
+- `steps` — the number of steps the annealer has taken so far (`0` for the initial state)
+
+Within one pass of the simulation, `termination_condition` and `state_change` see the count of completed steps, while `cool_down` sees the count including the step it is about to perform.
+
 ### `cool_down`
 
-By default, the simulation will decrease the `temperature` linearly by `cooling_rate` on each step of the annealing process. In some cases you may wish to override this to use a different cooling algorithm. To do so, you can use one of the other built-in cooling functions or you can specify a custom `cool_down` function. Custom functions can be any object that responds to `#call` and accepts four arguments: the `energy` calculation of the current object, the current `temperature` of the annealer, the `cooling_rate` for the simulation, and the number of `steps` the annealer has taken so far. It should return the new temperature as a Float.
+By default, the simulation will decrease the `temperature` linearly by `cooling_rate` on each step of the annealing process. In some cases you may wish to override this to use a different cooling algorithm. To do so, you can use one of the other built-in cooling functions or you can specify a custom `cool_down` function. Custom functions can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. It should return the new temperature as a Float.
 
 ```ruby
 # Use the built-in linear cool-down function (the default)
@@ -115,19 +128,19 @@ Annealing.configuration.cool_down = Annealing::Configuration::Coolers.exponentia
 Annealing.configuration.cool_down = Annealing::Configuration::Coolers.geometric(1.5)
 
 # Use a custom cool down function
-Annealing.configuration.cool_down = lambda do |energy, temperature, cooling_rate, steps|
+Annealing.configuration.cool_down = lambda do |step|
   # Reduce temperature exponentially when the temperature is above 500, then linearly
-  if temperature > 500
-    Annealing::Configuration::Coolers.exponential.call(energy, temperature, cooling_rate, steps)
+  if step.temperature > 500
+    Annealing::Configuration::Coolers.exponential.call(step)
   else
-    Annealing::Configuration::Coolers.linear.call(energy, temperature, cooling_rate, steps)
+    Annealing::Configuration::Coolers.linear.call(step)
   end
 end
 ```
 
 ### `cooling_rate` and `temperature`
 
-In the default configuration, the `cooling_rate` represents the amount by which the `temperature` will be reduced at each step, such that `temperature / cooling_rate` equals the maximum number of steps the annealer will go through in its search for the optimal solution. If a custom `cool_down` function is specified then `cooling_rate` will be passed to that function at each step along with the current temperature. The default `cooling_rate` value is `0.0003` and the default `temperature` is `10_000`.
+In the default configuration, the `cooling_rate` represents the amount by which the `temperature` will be reduced at each step, such that `temperature / cooling_rate` equals the maximum number of steps the annealer will go through in its search for the optimal solution. If a custom `cool_down` function is specified then the `cooling_rate` for the simulation will be available to that function at each step via `step.cooling_rate`, along with the current temperature via `step.temperature`. The default `cooling_rate` value is `0.0003` and the default `temperature` is `10_000`.
 
 ```ruby
 Annealing.configure do |config|
@@ -140,7 +153,9 @@ Generally speaking, simulations have a higher chance of finding optimal solution
 
 ### `energy_calculator`
 
-You must specify a `energy_calculator` function before running any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the `state` representing the current state being measured. It should return a measurement representing the efficiency of the current state based on all of its competing factors, and where a lower value represents a better configuration than a higher value.
+You must specify a `energy_calculator` function before running any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state` to access the state being measured. It should return a measurement representing the efficiency of the current state based on all of its competing factors, and where a lower value represents a better configuration than a higher value.
+
+Note: avoid calling `step.energy` inside your `energy_calculator`. It re-enters the calculator to compute the energy, which will raise a `SystemStackError`. Use `step.state` to compute the energy instead.
 
 ```ruby
 # A custom calculator class that takes into account hypothetical external factors
@@ -149,7 +164,8 @@ class PotentialSalesCalculator
     @initial_time_of_day = initial_time_of_day
   end
 
-  def energy(locations)
+  def energy(step)
+    locations = step.state
     arrival_time = @initial_time_of_day
     first_location_sales = potential_sales(locations.first, arrival_time)
     locations.each_cons(2).sum do |location1, location2|
@@ -177,11 +193,12 @@ Annealing.configuration.energy_calculator = calculator.method(:energy)
 
 ### `state_change`
 
-As with `energy_calculator`, you must specify a `state_change` function in order to run any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the `state` representing the current state that should be changed. It should return the changed state.
+As with `energy_calculator`, you must specify a `state_change` function in order to run any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state` to access the current state that should be changed, and return the changed state. The `step` also gives your function access to the current `steps` count, which can be used to scale the state change over time (for example, choosing neighboring states as a function of the current iteration).
 
 ```ruby
 class MyClass
-  def state_change(state)
+  def state_change(step)
+    state = step.state
     size = state.size
     swapped = state.dup
     idx_a = rand(size)
@@ -197,7 +214,7 @@ Annealing.configuration.state_change = instance.method(:state_change)
 
 ### `termination_condition`
 
-By default, a simulation will run until the temperature reaches 0. In some cases, you might want to specify a termination condition that will stop the annealing process as soon as some other condition is met regardless of the current temperature. To do so, you can use one of the other built-in termination condition functions or you can specify a custom one. Custom `termination_condition` functions can be any object that responds to `#call` and accepts three arguments: the current `state` of the object, the `energy` calculation of the current object, and the current `temperature` of the simulation. It should return a boolean value where `true` indicates the simulation should stop.
+By default, a simulation will run until the temperature reaches 0. In some cases, you might want to specify a termination condition that will stop the annealing process as soon as some other condition is met regardless of the current temperature. To do so, you can use one of the other built-in termination condition functions or you can specify a custom one. Custom `termination_condition` functions can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state`, `step.energy`, and `step.temperature` as needed. It should return a boolean value where `true` indicates the simulation should stop.
 
 ```ruby
 # Use the built-in zero-temperature termination condition function
@@ -207,9 +224,9 @@ Annealing.configuration.termination_condition = Annealing::Configuration::Termin
 Annealing.configuration.termination_condition = Annealing::Configuration::Terminators.energy_or_temp_is_zero?
 
 # Use a custom termination condition function
-Annealing.configuration.termination_condition = lambda do |_state, energy, temperature|
-  # Stop if the energy is below 500 and the temperature is below 100, or the temperature is already 0
-  temperature <= 0 || (energy <= 500 && temperature <= 500)
+Annealing.configuration.termination_condition = lambda do |step|
+  # Stop if the energy is below 500 and the temperature is below 500, or the temperature is already 0
+  step.temperature <= 0 || (step.energy <= 500 && step.temperature <= 500)
 end
 ```
 
