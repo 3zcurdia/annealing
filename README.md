@@ -234,7 +234,16 @@ end
 
 ### `return_best`
 
-If true, will return the best (lowest energy) state seen during the simulation. If false (the default), `Simulator#run` will return the final state reached when the simulation completes.
+If true (the default), will return the best (lowest energy) state seen during the simulation. If false, `Simulator#run` will return the final state reached when the simulation completes.
+
+To preserve the previous final-state behavior, set `return_best: false` globally, on `Annealing::Simulator.new`, or for an individual run:
+
+```ruby
+solution = Annealing.simulate(locations,
+                              energy_calculator: energy_calculator,
+                              state_change: state_change,
+                              return_best: false)
+```
 
 ## Configuration precedence
 

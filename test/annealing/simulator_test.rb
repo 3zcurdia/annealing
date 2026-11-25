@@ -136,22 +136,29 @@ module Annealing
       state_changer.verify
     end
 
-    def run_fixed_simulation(return_best:)
+    def run_fixed_simulation(simulator: @simulator, **config_overrides)
       energies = { a: 5, b: 4, c: 1, d: 6 }
       state_sequence = %i[b c d].each
       call_count = 0
 
       Kernel.stub(:rand, 0.0) do
-        @simulator.run(:a,
-                       energy_calculator: ->(step) { energies.fetch(step.state) },
-                       state_change: ->(_step) { state_sequence.next },
-                       cool_down: ->(step) { step.temperature - 1 },
-                       termination_condition: ->(_step) { (call_count += 1) >= 4 },
-                       return_best: return_best)
+        simulator.run(:a,
+                      energy_calculator: ->(step) { energies.fetch(step.state) },
+                      state_change: ->(_step) { state_sequence.next },
+                      cool_down: ->(step) { step.temperature - 1 },
+                      termination_condition: ->(_step) { (call_count += 1) >= 4 },
+                      **config_overrides)
       end
     end
 
-    def test_finds_optimal_solution_when_return_best
+    def test_returns_optimal_solution_by_default
+      final_metal = run_fixed_simulation
+
+      assert_equal :c, final_metal.state
+      assert_equal 1, final_metal.energy
+    end
+
+    def test_finds_optimal_solution_when_return_best_is_true
       final_metal = run_fixed_simulation(return_best: true)
 
       assert_equal :c, final_metal.state
@@ -176,6 +183,22 @@ module Annealing
 
     def test_finds_suboptimal_solution_when_not_return_best
       final_metal = run_fixed_simulation(return_best: false)
+
+      assert_equal :d, final_metal.state
+      assert_equal 6, final_metal.energy
+    end
+
+    def test_global_configuration_can_disable_return_best
+      Annealing.configuration.return_best = false
+      final_metal = run_fixed_simulation(simulator: Annealing::Simulator.new)
+
+      assert_equal :d, final_metal.state
+      assert_equal 6, final_metal.energy
+    end
+
+    def test_instance_configuration_can_disable_return_best
+      simulator = Annealing::Simulator.new(return_best: false)
+      final_metal = run_fixed_simulation(simulator: simulator)
 
       assert_equal :d, final_metal.state
       assert_equal 6, final_metal.energy
@@ -240,7 +263,7 @@ module Annealing
 
       assert_equal @collection, state.state
       assert_equal @temperature, state.temperature
-      assert_equal 0, calls
+      assert_equal 1, calls
     end
 
     def test_run_with_return_best_computes_the_energy_when_no_steps_are_taken
