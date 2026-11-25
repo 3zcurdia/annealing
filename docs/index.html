@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Annealing is a Ruby gem for simulated annealing. Learn why it exists, how it works, and how to use it.">
+  <title>Annealing — Simulated Annealing for Ruby</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --bg-alt: #fffdf8;
+      --surface: #ffffff;
+      --surface-2: #efe9dd;
+      --text: #1f2430;
+      --muted: #5d6573;
+      --border: #d9d0c1;
+      --accent: #b45309;
+      --accent-2: #0f766e;
+      --accent-soft: rgba(180, 83, 9, 0.12);
+      --code-bg: #1f2937;
+      --code-text: #f9fafb;
+      --shadow: 0 10px 30px rgba(31, 36, 48, 0.08);
+      --radius: 16px;
+      --max: 1120px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141821;
+        --bg-alt: #191f2b;
+        --surface: #1d2432;
+        --surface-2: #283142;
+        --text: #edf2f7;
+        --muted: #bcc7d6;
+        --border: #39475f;
+        --accent: #f59e0b;
+        --accent-2: #5eead4;
+        --accent-soft: rgba(245, 158, 11, 0.14);
+        --code-bg: #0f1724;
+        --code-text: #f8fafc;
+        --shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", sans-serif;
+      line-height: 1.65;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, var(--accent-soft), transparent 28%),
+        linear-gradient(180deg, var(--bg-alt), var(--bg));
+    }
+    a { color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 0.18em; }
+    a:hover { opacity: 0.88; }
+    code, pre, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .wrap { width: min(calc(100% - 2rem), var(--max)); margin-inline: auto; }
+    .skip {
+      position: absolute; left: -999px; top: 0; padding: 0.75rem 1rem;
+      background: var(--accent); color: #fff; border-radius: 0 0 8px 8px; z-index: 100;
+    }
+    .skip:focus { left: 1rem; }
+    header {
+      padding: 4.5rem 0 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .eyebrow {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+    h1 { font-size: clamp(2.4rem, 7vw, 4.8rem); margin: 0.8rem 0 1rem; max-width: 11ch; }
+    .lede { font-size: clamp(1.05rem, 2.2vw, 1.3rem); max-width: 42rem; color: var(--muted); margin: 0; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 2rem;
+      align-items: end;
+    }
+    .hero-card, .card, .step, .note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card { padding: 1.5rem; }
+    .hero-card h2 { font-size: 1.1rem; margin: 0 0 0.75rem; }
+    .hero-card ul { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+    .hero-card li + li { margin-top: 0.45rem; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.7rem 1rem; border-radius: 10px; font-weight: 650;
+      text-decoration: none; border: 1px solid var(--border);
+    }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.secondary { background: var(--surface); color: var(--text); }
+    nav.toc {
+      padding: 1rem 0;
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(10px);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    nav.toc ul {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-wrap: wrap; gap: 0.5rem 1rem;
+      font-size: 0.95rem;
+    }
+    nav.toc a { color: var(--muted); text-decoration: none; font-weight: 550; }
+    nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); }
+    main section { padding: 3.5rem 0; border-bottom: 1px solid var(--border); }
+    .section-head { margin-bottom: 1.5rem; max-width: 48rem; }
+    .section-head p { color: var(--muted); margin: 0.5rem 0 0; }
+    h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0; }
+    h3 { font-size: 1.15rem; margin: 0 0 0.6rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+    .card { padding: 1.25rem; }
+    .card p, .card li, .step p, .note p { color: var(--muted); }
+    .card ul { padding-left: 1.2rem; margin: 0.75rem 0 0; }
+    .video {
+      aspect-ratio: 16 / 9; width: 100%; border: 0;
+      border-radius: calc(var(--radius) - 2px); display: block; background: #000;
+    }
+    .video-shell { padding: 0.5rem; }
+    .caption { font-size: 0.92rem; color: var(--muted); margin: 0.75rem 0 0; }
+    .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
+    .step { padding: 1rem; }
+    .step-num {
+      width: 2rem; height: 2rem; border-radius: 50%;
+      display: inline-grid; place-items: center; font-weight: 700;
+      background: var(--accent-soft); color: var(--accent); margin-bottom: 0.75rem;
+    }
+    pre {
+      margin: 0; padding: 1rem 1.1rem; overflow-x: auto;
+      background: var(--code-bg); color: var(--code-text);
+      border-radius: 12px; font-size: 0.92rem; line-height: 1.6;
+    }
+    .code-label {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--muted); margin: 0 0 0.5rem;
+    }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; min-width: 680px; }
+    th, td { padding: 0.85rem 1rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+    th { background: var(--surface-2); font-size: 0.9rem; }
+    tr:last-child td { border-bottom: 0; }
+    td code, th code, p code, li code {
+      font-size: 0.92em; padding: 0.12em 0.35em; border-radius: 5px;
+      background: color-mix(in srgb, var(--surface-2) 75%, transparent);
+    }
+    pre code { padding: 0; background: transparent; }
+    .note {
+      padding: 1rem 1.1rem; margin-top: 1rem;
+      border-left: 4px solid var(--accent-2);
+    }
+    .note strong { color: var(--text); }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 0; margin: 0; list-style: none; }
+    .pill-list li {
+      padding: 0.45rem 0.75rem; border-radius: 999px;
+      background: var(--surface-2); color: var(--text); font-size: 0.92rem;
+    }
+    footer { padding: 2.5rem 0 3.5rem; color: var(--muted); font-size: 0.95rem; }
+    footer p { margin: 0.4rem 0; }
+    @media (max-width: 960px) {
+      .hero-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      header { padding-top: 3.5rem; }
+      .steps { grid-template-columns: 1fr; }
+      nav.toc { position: static; backdrop-filter: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Ruby gem · Simulated annealing</span>
+        <h1>Annealing</h1>
+        <p class="lede">A small Ruby library for finding good solutions to problems with many competing tradeoffs, inspired by the way metal cools.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="https://github.com/3zcurdia/annealing">View on GitHub</a>
+          <a class="btn secondary" href="#quick-start">Quick start</a>
+        </div>
+      </div>
+      <aside class="hero-card" aria-label="Project summary">
+        <h2>What this project gives you</h2>
+        <ul>
+          <li>A general-purpose simulated annealing simulator for Ruby objects.</li>
+          <li>You define the state, how to score it, and how to change it.</li>
+          <li>Configuration can be global, per simulator, or per run.</li>
+          <li>Best for hard search problems where an exact answer is expensive.</li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Page sections">
+    <div class="wrap">
+      <ul>
+        <li><a href="#why">Why</a></li>
+        <li><a href="#inspiration">Inspiration</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#quick-start">Quick start</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#learn-more">Learn more</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="content">
+    <section id="why">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Why this project exists</h2>
+          <p>Some problems have too many possible combinations to check one by one. Annealing gives you a practical way to search that space by trying changes, keeping improvements, and sometimes accepting worse moves so the search does not get stuck.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>The problem</h3>
+            <p>Routing, scheduling, packing, layout, and assignment problems often involve many variables that pull in different directions. The “best” answer is hard to compute directly.</p>
+          </article>
+          <article class="card">
+            <h3>The approach</h3>
+            <p>Simulated annealing explores neighboring states. It always likes lower-energy states, but early on it can also accept a worse state with some probability.</p>
+          </article>
+          <article class="card">
+            <h3>The expectation</h3>
+            <p>The algorithm is designed to find a <strong>good</strong> solution, not to prove a perfect global optimum. Tuning temperature, cooling, and state changes matters.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="inspiration">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>The original inspiration</h2>
+          <p>This repository was inspired by SciShow’s explanation of simulated annealing: <a href="https://www.youtube.com/watch?v=I_0GBWCKft8"><em>The Most Metal Algorithm in Computer Science</em></a>.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card video-shell">
+            <iframe
+              class="video"
+              src="https://www.youtube-nocookie.com/embed/I_0GBWCKft8"
+              title="The Most Metal Algorithm in Computer Science — SciShow"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+            <p class="caption">Video by <a href="https://www.youtube.com/c/SciShow">SciShow</a>. Embedded from YouTube-nocookie.</p>
+          </div>
+          <article class="card">
+            <h3>From hot metal to better answers</h3>
+            <p>In metallurgy, annealing heats metal and cools it slowly. Hot atoms move freely; as the metal cools, they settle into lower-energy arrangements.</p>
+            <p>The algorithm borrows that idea:</p>
+            <ul>
+              <li><strong>State</strong> — a possible solution.</li>
+              <li><strong>Energy</strong> — how bad or costly that solution is.</li>
+              <li><strong>Temperature</strong> — how willing the search is to explore.</li>
+              <li><strong>Cooling</strong> — the gradual reduction of that willingness over time.</li>
+            </ul>
+            <p>Early randomness helps escape local dead ends. Later stability helps the search settle on a strong answer.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>How it works</h2>
+          <p>The simulator repeats a small loop. You supply the domain-specific parts; Annealing handles the accept/reject and cooling process.</p>
+        </div>
+        <div class="steps" role="list">
+          <article class="step" role="listitem">
+            <div class="step-num">1</div>
+            <h3>Start</h3>
+            <p>Begin with an initial state and an initial temperature.</p>
+          </article>
+          <article class="step" role="listitem">
+            <div class="step-num">2</div>
+            <h3>Measure</h3>
+            <p>Your <code>energy_calculator</code> scores the current state. Lower is better.</p>
+          </article>
+          <article class="step" role="listitem">
+            <div class="step-num">3</div>
+            <h3>Change</h3>
+            <p>Your <code>state_change</code> proposes a nearby state to try next.</p>
+          </article>
+          <article class="step" role="listitem">
+            <div class="step-num">4</div>
+            <h3>Decide</h3>
+            <p>Better states are accepted. Worse states may still be accepted while hot.</p>
+          </article>
+          <article class="step" role="listitem">
+            <div class="step-num">5</div>
+            <h3>Cool</h3>
+            <p>Temperature drops until the termination condition says the run is done.</p>
+          </article>
+        </div>
+        <div class="note">
+          <strong>Important:</strong> at temperature zero, the annealer accepts only strictly lower-energy states. Equal or higher energy is not accepted at that point.
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Install</h2>
+          <p>Annealing requires Ruby 3.4 or newer.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <p class="code-label">With Bundler</p>
+            <pre><code># Gemfile
+gem "annealing"</code></pre>
+            <pre style="margin-top:0.75rem;"><code>bundle install</code></pre>
+          </div>
+          <div class="card">
+            <p class="code-label">With RubyGems</p>
+            <pre><code>gem install annealing</code></pre>
+            <p class="code-label" style="margin-top:1rem;">For local development</p>
+            <pre><code>bin/setup
+bundle exec rake test</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quick-start">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Quick start</h2>
+          <p>The classic example is the traveling salesperson problem: visit every location once while keeping the total route short. The example below uses a small custom temperature and cooling rate so it runs quickly.</p>
+        </div>
+        <div class="card">
+          <p class="code-label">Ruby</p>
+          <pre><code>require "annealing"
+
+Location = Struct.new(:x, :y) do
+  def distance(other)
+    dx = (x - other.x).abs
+    dy = (y - other.y).abs
+    Math.sqrt(dx**2 + dy**2)
+  end
+end
+
+locations = [
+  Location.new(60, 200),
+  Location.new(180, 200),
+  Location.new(40, 120),
+  Location.new(100, 120),
+  Location.new(20, 40)
+].shuffle
+
+energy_calculator = lambda do |step|
+  step.state.each_cons(2).sum { |a, b| a.distance(b) }
+end
+
+state_change = lambda do |step|
+  swapped = step.state.dup
+  i, j = Array.new(2) { rand(swapped.size) }
+  swapped[i], swapped[j] = swapped[j], swapped[i]
+  swapped
+end
+
+route = Annealing.simulate(
+  locations,
+  energy_calculator: energy_calculator,
+  state_change: state_change,
+  temperature: 5_000,
+  cooling_rate: 0.5
+)
+
+p route.map { |loc| [loc.x, loc.y] }</code></pre>
+          <div class="note">
+            <strong>Why the custom temperature/cooling rate?</strong> The default configuration (<code>temperature: 10_000</code>, <code>cooling_rate: 0.0003</code>) considers about 33 million proposed states. That is useful for thorough searches, but too slow for a first experiment.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="configuration">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Configuration</h2>
+          <p>You can configure Annealing globally, on a simulator instance, or for a single run. Later scopes override earlier ones: <code>global &lt; simulator instance &lt; just in time</code>.</p>
+        </div>
+
+        <div class="table-wrap" aria-label="Configuration options">
+          <table>
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Default</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>cool_down</code></td>
+                <td><code>Coolers.linear</code></td>
+                <td>Calculates the next temperature from an <code>Annealing::Step</code>.</td>
+              </tr>
+              <tr>
+                <td><code>cooling_rate</code></td>
+                <td><code>0.0003</code></td>
+                <td>Amount used by the default linear cooler; available to custom coolers as <code>step.cooling_rate</code>.</td>
+              </tr>
+              <tr>
+                <td><code>energy_calculator</code></td>
+                <td>None, required</td>
+                <td>Scores a state. Lower energy means a better solution. Use <code>step.state</code>, not <code>step.energy</code>.</td>
+              </tr>
+              <tr>
+                <td><code>state_change</code></td>
+                <td>None, required</td>
+                <td>Returns the next candidate state based on <code>step.state</code>.</td>
+              </tr>
+              <tr>
+                <td><code>temperature</code></td>
+                <td><code>10_000.0</code></td>
+                <td>Starting temperature. Higher values allow more exploration.</td>
+              </tr>
+              <tr>
+                <td><code>termination_condition</code></td>
+                <td><code>Terminators.temp_is_zero?</code></td>
+                <td>Returns <code>true</code> when the simulation should stop.</td>
+              </tr>
+              <tr>
+                <td><code>return_best</code></td>
+                <td><code>false</code></td>
+                <td>Return the best state seen during the run instead of the final state.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <article class="card">
+            <h3>The Step object</h3>
+            <p>Every custom function receives one <code>Annealing::Step</code> with read-only data:</p>
+            <ul>
+              <li><code>state</code> — current state.</li>
+              <li><code>energy</code> — current energy.</li>
+              <li><code>temperature</code> — current temperature.</li>
+              <li><code>cooling_rate</code> — configured cooling rate.</li>
+              <li><code>steps</code> — completed step count.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Built-in helpers</h3>
+            <p class="code-label">Coolers</p>
+            <ul class="pill-list">
+              <li><code>Coolers.linear</code></li>
+              <li><code>Coolers.exponential</code></li>
+              <li><code>Coolers.geometric(ratio)</code></li>
+            </ul>
+            <p class="code-label" style="margin-top:1rem;">Terminators</p>
+            <ul class="pill-list">
+              <li><code>Terminators.temp_is_zero?</code></li>
+              <li><code>Terminators.energy_or_temp_is_zero?</code></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="learn-more">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Learn more</h2>
+          <p>A few practical notes for getting useful results from the gem.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Good use cases</h3>
+            <p>Use annealing when you can score a candidate solution and generate nearby alternatives, but checking every possibility is impractical.</p>
+          </article>
+          <article class="card">
+            <h3>Tuning tips</h3>
+            <p>Start with a small problem. If results are unstable, raise temperature or lower cooling rate. If runs are too slow, reduce steps or add a custom termination condition.</p>
+          </article>
+          <article class="card">
+            <h3>Common pitfalls</h3>
+            <p>Do not call <code>step.energy</code> inside <code>energy_calculator</code>. Keep state changes small. Remember that <code>Annealing.simulate</code> returns the final state unless you configure <code>return_best</code>.</p>
+          </article>
+        </div>
+        <div class="card" style="margin-top:1.25rem;">
+          <h3>Project resources</h3>
+          <ul class="pill-list">
+            <li><a href="https://github.com/3zcurdia/annealing">GitHub repository</a></li>
+            <li><a href="https://github.com/3zcurdia/annealing/blob/main/README.md">README</a></li>
+            <li><a href="https://github.com/3zcurdia/annealing/blob/main/CHANGELOG.md">Changelog</a></li>
+            <li><a href="architecture.html">Architecture diagram</a></li>
+            <li><a href="https://github.com/3zcurdia/annealing/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a></li>
+            <li><a href="https://github.com/3zcurdia/annealing/blob/main/LICENSE">MIT License</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>Annealing</strong> — simulated annealing for Ruby objects.</p>
+      <p>Created by Luis Ezcurdia and Chris Bloom. Inspired by <a href="https://www.youtube.com/watch?v=I_0GBWCKft8">SciShow’s “The Most Metal Algorithm in Computer Science”</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>

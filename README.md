@@ -29,13 +29,13 @@ gem install annealing
 
 Simulated annealing algorithms work by comparing multiple permutations of a given object and measuring their relative efficiencies based on any number of competing factors. If you aren't already familiar with the concept of simulated annealing, we recommend watching [The Most Metal Algorithm in Computer Science](https://www.youtube.com/watch?v=I_0GBWCKft8) from [SciShow](https://www.youtube.com/c/SciShow) as it will help you understand some of the concepts and terms used below.
 
-In order to use this algorithm we must first define 3 things:
+In order to use this algorithm, we must first define three things:
 
-1. an initial object state to evaluate
-2. a way to measure the energy of that state
-3. and a way to change the state of the object over time
+1. An initial object state to evaluate.
+2. A way to measure the energy of that state.
+3. A way to change the state of the object over time.
 
-Lets use the the traveling salesperson problem as an example. First we will define a Location object with a `distance` method to measure the distance between two locations.
+Let's use the traveling salesperson problem as an example. First, we will define a `Location` object with a `distance` method to measure the distance between two locations.
 
 ```ruby
 Location = Struct.new(:x, :y) do
@@ -63,7 +63,7 @@ locations = [
 ].shuffle
 ```
 
-Next we need a way to calculate the total energy of traveling to each location in turn, with low energy states preferable to high energy states. Think of it as a representation of the efficiency of the trip; the further away one point is away from the next, the less efficient the trip is.
+Next, we need a way to calculate the total energy of traveling to each location in turn, with low-energy states preferable to high-energy states. Think of it as a representation of the efficiency of the trip; the farther apart two points are, the less efficient the trip is.
 
 ```ruby
 energy_calculator = lambda do |step|
@@ -87,7 +87,7 @@ state_change = lambda do |step|
 end
 ```
 
-Now we can run the simulation. With the default configuration it will consider ~33 million permutations of the route, so this may take several minutes to complete.
+Now we can run the simulation. With the default configuration, it will consider about 33 million proposed states, so this may take several minutes to complete.
 
 ```ruby
 optimal_route = Annealing.simulate(locations,
@@ -149,11 +149,11 @@ Annealing.configure do |config|
 end
 ```
 
-Generally speaking, simulations have a higher chance of finding optimal solutions with a high initial temperature and a low cooling rate. A high temperature gives the simulation more time to search through neighboring states for low energy configurations, while a low cooling rate increases the probability that the simulation will select a low-energy configuration when comparing two states. For example, consider two configurations: `temperature(10000) / cooling_rate(1)` and `temperature(100) / cooling_rate(0.01)`. Even though both provide 10,000 steps when using the default cool down function, the latter configuration will allow for smaller temperature readings which is more likely to result in a more optimal final state.
+Generally speaking, simulations have a higher chance of finding good solutions with a high initial temperature and a low cooling rate. A high temperature gives the simulation more time to search through neighboring states for low-energy configurations, while a low cooling rate increases the probability that the simulation will select a low-energy configuration when comparing two states. For example, consider two configurations: `temperature(10_000) / cooling_rate(1)` and `temperature(100) / cooling_rate(0.01)`. Even though both provide 10,000 steps when using the default cool-down function, the latter configuration allows smaller temperature changes, which makes the annealer more likely to settle into a better final state.
 
 ### `energy_calculator`
 
-You must specify a `energy_calculator` function before running any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state` to access the state being measured. It should return a measurement representing the efficiency of the current state based on all of its competing factors, and where a lower value represents a better configuration than a higher value.
+You must specify an `energy_calculator` function before running any simulations; no default function is provided. The function can be any object that responds to `#call` and accepts a single argument: the [step object](#the-step-object) for the current iteration. Use `step.state` to access the state being measured. It should return a measurement representing the efficiency of the current state based on all of its competing factors, where a lower value represents a better configuration than a higher value.
 
 Note: avoid calling `step.energy` inside your `energy_calculator`. It re-enters the calculator to compute the energy, which will raise a `SystemStackError`. Use `step.state` to compute the energy instead.
 
@@ -238,7 +238,7 @@ If true, will return the best (lowest energy) state seen during the simulation. 
 
 ## Configuration precedence
 
-Configuration options can be set globally using `Annealing.configuration` or `Annealing.configure`, on `Annealing::Simulator.new` to be used on all subsequent runs of that instance, and just-in-time on `Annealing.simulate` and `Annealing::Simulator#run`. They are applied in reverse order of precedence.
+Configuration options can be set globally using `Annealing.configuration` or `Annealing.configure`, on `Annealing::Simulator.new` for all subsequent runs of that instance, and just in time on `Annealing.simulate` and `Annealing::Simulator#run`. Later scopes override earlier ones: global < simulator instance < just in time.
 
 ### Global configuration
 
@@ -259,7 +259,7 @@ solution = Annealing.simulate(locations)
 
 ### Instance configuration
 
-Instance configurations can be set on new instances of `Annealing::Simulator` objects and will apply to all subsequent simulation runs for that instance. Instance configuration options override their global configuration counterparts.
+Instance configurations can be set on `Annealing::Simulator` instances and will apply to all subsequent simulation runs for that instance. Instance configuration options override their global configuration counterparts.
 
 ```ruby
 Annealing.configure do |config|
@@ -302,7 +302,7 @@ simulation.run(locations.shuffle, cooling_rate: 0.003)
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rake` to run the test suite. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `lib/annealing/version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
