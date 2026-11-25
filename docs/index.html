@@ -218,6 +218,10 @@
       *, *::before, *::after { transition: none !important; animation: none !important; }
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <style>
+    pre code.hljs { background: transparent; padding: 0; }
+  </style>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
@@ -352,14 +356,14 @@
         <div class="grid-2">
           <div class="card">
             <p class="code-label">Bundler</p>
-            <pre><code># Gemfile
+            <pre><code class="language-ruby"># Gemfile
 gem "annealing"</code></pre>
-            <pre style="margin-top:0.75rem;"><code>bundle install</code></pre>
+            <pre style="margin-top:0.75rem;"><code class="language-bash">bundle install</code></pre>
           </div>
           <div class="card">
             <p class="code-label">RubyGems / Development</p>
-            <pre><code>gem install annealing</code></pre>
-            <pre style="margin-top:0.75rem;"><code>bin/setup
+            <pre><code class="language-bash">gem install annealing</code></pre>
+            <pre style="margin-top:0.75rem;"><code class="language-bash">bin/setup
 bundle exec rake test</code></pre>
           </div>
         </div>
@@ -375,7 +379,7 @@ bundle exec rake test</code></pre>
         </div>
         <div class="card">
           <p class="code-label">Ruby</p>
-          <pre><code>require "annealing"
+          <pre><code class="language-ruby">require "annealing"
 
 Location = Struct.new(:x, :y) do
   def distance(other)
@@ -517,5 +521,7 @@ p route.map { |loc| [loc.x, loc.y] }</code></pre>
       <p>Created by Luis Ezcurdia and Chris Bloom. Inspired by <a href="https://www.youtube.com/watch?v=I_0GBWCKft8">SciShow’s “The Most Metal Algorithm in Computer Science”</a>.</p>
     </div>
   </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>
