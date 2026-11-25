@@ -28,7 +28,7 @@ module Annealing
         if !ratio.is_a?(Float) || !ratio.finite?
           raise(ConfigurationError, "Geometric ratio must be a float.")
         elsif ratio < 1.0
-          raise(ConfigurationError, "A geometric ratio ratio below 1.0 can never reach zero.")
+          raise(ConfigurationError, "A geometric ratio below 1.0 can never reach zero.")
         end
 
         lambda { |step|

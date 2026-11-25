@@ -23,3 +23,7 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
+
+# Favor deep methods over many shallow helpers (A Philosophy of Software Design)
+Metrics/MethodLength:
+  Max: 25

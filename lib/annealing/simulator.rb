@@ -9,7 +9,6 @@ module Annealing
       @configuration = Annealing.configuration.merge(config_hash)
     end
 
-    # rubocop:disable-next Metrics/MethodLength
     def run(initial_state, config_hash = {})
       with_runtime_config(config_hash) do |runtime_config|
         initial_temperature = runtime_config.temperature

@@ -180,5 +180,26 @@ module Annealing
       assert_equal :d, final_metal.state
       assert_equal 6, final_metal.energy
     end
+
+    def test_every_custom_function_receives_a_step
+      received = Hash.new { |hash, key| hash[key] = [] }
+      # Wrap a function so it records the class of each argument it receives
+      record = lambda do |name, function|
+        lambda do |step|
+          received[name] << step.class
+          function.call(step)
+        end
+      end
+
+      @simulator.run(@collection,
+                     cool_down: record.call(:cool_down, Configuration::Coolers.linear),
+                     energy_calculator: record.call(:energy_calculator, ->(_) { @fake_energy }),
+                     state_change: record.call(:state_change, lambda(&:state)),
+                     termination_condition: record.call(:termination_condition,
+                                                        Configuration::Terminators.temp_is_zero?))
+
+      assert_equal %i[cool_down energy_calculator state_change termination_condition], received.keys.sort
+      received.each_value { |classes| assert_equal [Annealing::Step], classes.uniq }
+    end
   end
 end
