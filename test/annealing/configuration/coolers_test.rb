@@ -16,7 +16,7 @@ module Annealing
 
       def test_linear_cooler_reduces_temperature_linearly
         cooler = @coolers.linear
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        cooled_temp = cooler.call(build_step(@temperature, @step))
 
         assert_in_delta @temperature - @cooling_rate,
                         cooled_temp
@@ -28,7 +28,7 @@ module Annealing
 
       def test_exponential_cooler_reduces_temperature_exponentially
         cooler = @coolers.exponential
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        cooled_temp = cooler.call(build_step(@temperature, @step))
 
         assert_in_delta @temperature - (Math.exp(@step - 1) * @cooling_rate),
                         cooled_temp
@@ -36,9 +36,9 @@ module Annealing
 
       def test_exponential_cooler_reduces_temperature_by_more_on_each_step
         cooler = @coolers.exponential
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, 1)
+        cooled_temp = cooler.call(build_step(@temperature, 1))
         first = @temperature - cooled_temp
-        second = @temperature - cooler.call(nil, @temperature, @cooling_rate, 2)
+        second = @temperature - cooler.call(build_step(@temperature, 2))
 
         assert_in_delta @temperature - @cooling_rate, cooled_temp
         assert_operator second, :>, first
@@ -51,15 +51,15 @@ module Annealing
       def test_geometric_cooler_reduces_temperature_geometrically
         ratio = 3.0
         cooler = @coolers.geometric(ratio)
-        cooled_temp = cooler.call(nil, @temperature, @cooling_rate, @step)
+        cooled_temp = cooler.call(build_step(@temperature, @step))
 
         assert_in_delta @temperature - (@cooling_rate * (ratio**(@step - 1))),
                         cooled_temp
       end
 
       def test_geometric_cooler_defaults_to_a_ratio_of_two
-        default = @coolers.geometric.call(nil, @temperature, @cooling_rate, @step)
-        explicit = @coolers.geometric(2.0).call(nil, @temperature, @cooling_rate, @step)
+        default = @coolers.geometric.call(build_step(@temperature, @step))
+        explicit = @coolers.geometric(2.0).call(build_step(@temperature, @step))
 
         assert_in_delta explicit, default
       end
@@ -86,6 +86,14 @@ module Annealing
 
       private
 
+      # Build a real Annealing::Step for the given temperature and step count,
+      # the way the simulator does.
+      def build_step(temperature, steps)
+        configuration = Annealing::Configuration.new(cooling_rate: @cooling_rate)
+        metal = Annealing::Metal.new(nil, temperature, configuration)
+        Annealing::Step.new(metal, configuration, steps)
+      end
+
       # Apply the cooler repeatedly, as the simulator does, and return how many
       # steps it took to reach zero. Stops at STEP_LIMIT so that a cooler that
       # never reaches zero fails the test instead of hanging the suite.
@@ -93,7 +101,7 @@ module Annealing
         steps = 0
         while temperature.positive? && steps < STEP_LIMIT
           steps += 1
-          temperature = cooler.call(nil, temperature, @cooling_rate, steps)
+          temperature = cooler.call(build_step(temperature, steps))
         end
         steps
       end

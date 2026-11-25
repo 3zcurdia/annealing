@@ -19,10 +19,10 @@ class AnnealingTest < Minitest::Test
     global_energy_calculator = Minitest::Mock.new
     global_state_changer = Minitest::Mock.new
     total_iterations.times do
-      global_energy_calculator.expect(:call, 42, [collection])
-      global_state_changer.expect(:call, collection, [collection])
+      global_energy_calculator.expect(:call, 42) { |step| step.state == collection }
+      global_state_changer.expect(:call, collection) { |step| step.state == collection }
     end
-    global_energy_calculator.expect(:call, 42, [collection])
+    global_energy_calculator.expect(:call, 42) { |step| step.state == collection }
 
     Annealing.configure do |config|
       config.temperature = custom_temperature

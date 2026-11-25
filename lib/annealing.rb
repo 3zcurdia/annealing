@@ -27,4 +27,5 @@ end
 require "annealing/configuration"
 require "annealing/metal"
 require "annealing/simulator"
+require "annealing/step"
 require "annealing/version"

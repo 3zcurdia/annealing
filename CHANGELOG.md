@@ -10,6 +10,11 @@
 - Avoid a redundant `energy_calculator` call when `return_best` is true (#38)
 - Fix README examples and `return_best` default description, and the "algoritm" typo (#39)
 - Bump json to 2.21.2 for a use-after-free fix (#36) and refresh development dependencies
+- BREAKING: normalize the custom function interfaces (closes #17). The
+  `energy_calculator`, `state_change`, `cool_down`, and `termination_condition`
+  functions now each receive a single `Annealing::Step` argument instead of
+  their previous positional arguments. See the README for the new signatures.
+  Thanks to @webbrain-one for the original implementation in #35.
 
 ## [0.4.1] - 2026-07-16
 

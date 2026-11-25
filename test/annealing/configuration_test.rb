@@ -18,7 +18,7 @@ module Annealing
       cool_down = @subject.new.cool_down
 
       assert_respond_to cool_down, :call
-      assert_equal 1, cool_down.call(nil, 2, 1, nil)
+      assert_equal 1, cool_down.call(step_with(temperature: 2))
     end
 
     def test_sets_a_default_cooling_rate
@@ -35,9 +35,9 @@ module Annealing
       termination_condition = @subject.new.termination_condition
 
       assert_respond_to termination_condition, :call
-      refute termination_condition.call(nil, nil, 1)
-      assert termination_condition.call(nil, nil, 0)
-      assert termination_condition.call(nil, nil, -1)
+      refute termination_condition.call(step_with(temperature: 1))
+      assert termination_condition.call(step_with(temperature: 0))
+      assert termination_condition.call(step_with(temperature: -1))
     end
 
     def test_does_not_set_a_default_energy_calculator_function
@@ -175,6 +175,16 @@ module Annealing
         new_config.validate!
       end
       assert_equal "Unrecognized configuration options: bad", error.message
+    end
+
+    private
+
+    # Build a real Annealing::Step for a given temperature, the way the
+    # simulator does.
+    def step_with(temperature:, cooling_rate: 1)
+      configuration = @subject.new(cooling_rate: cooling_rate)
+      metal = Annealing::Metal.new(nil, temperature, configuration)
+      Annealing::Step.new(metal, configuration, 0)
     end
   end
 end
