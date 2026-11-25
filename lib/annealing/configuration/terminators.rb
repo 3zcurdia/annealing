@@ -17,7 +17,7 @@ module Annealing
       # is at or below zero
       def energy_or_temp_is_zero?
         lambda { |step|
-          step.energy <= 0 || temp_is_zero?.call(step)
+          step.energy <= 0 || step.temperature <= 0
         }
       end
     end

@@ -76,7 +76,7 @@ module Annealing
         [0.99, 0.5, 0.0, -2.0].each do |ratio|
           error = assert_raises(ConfigurationError) { @coolers.geometric(ratio) }
 
-          assert_match(/below 1\.0/, error.message)
+          assert_equal "A geometric ratio below 1.0 can never reach zero.", error.message
         end
       end
 
