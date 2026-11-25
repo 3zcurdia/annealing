@@ -8,16 +8,16 @@ module Annealing
 
       # Returns true when the temperature is at or below zero
       def temp_is_zero?
-        lambda { |_state, _energy, temperature|
-          temperature <= 0
+        lambda { |step|
+          step.temperature <= 0
         }
       end
 
       # Returns true if a 0-energy state is detected, or when the temperature
       # is at or below zero
       def energy_or_temp_is_zero?
-        lambda { |state, energy, temperature|
-          energy <= 0 || temp_is_zero?.call(state, energy, temperature)
+        lambda { |step|
+          step.energy <= 0 || temp_is_zero?.call(step)
         }
       end
     end
