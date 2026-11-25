@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/luis.ezcurdia/code/annealing/.archify/architecture-annealing-20261125-144202/candidate.json",
+    "sha256": "25b0476003607a9bb6ed4654ab6c6f9e283532fed9a79dc9c10f60c936cc1f70",
+    "bytes": 4993
+  },
+  "artifact": {
+    "path": "/Users/luis.ezcurdia/code/annealing/docs/architecture.html",
+    "sha256": "2a901c72ee70951b34bb89768e041a9aa4df5ea118f701d7c970cdd5d99ac6e9",
+    "bytes": 948162
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/luis.ezcurdia/code/annealing/docs/architecture.finalize.json",
+    "summaryReceipt": "/Users/luis.ezcurdia/code/annealing/docs/architecture.finalize-summary.json",
+    "browserCheckReceipt": "/Users/luis.ezcurdia/code/annealing/docs/architecture.browser-check.json"
+  },
+  "repositoryReferences": {
+    "status": "verified",
+    "revision": "57e10699b5fcbf3b7e8d94046f46bd64a5c2d353",
+    "count": 11
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.3.2",
+    "availableVersion": "3.3.1",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-25T20:42:23.709Z",
+    "source": "network",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 9547,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

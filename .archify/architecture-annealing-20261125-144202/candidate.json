@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Annealing Ruby Gem Architecture",
+    "locale": "en",
+    "output": "docs/architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "git@github.com:3zcurdia/annealing.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "57e10699b5fcbf3b7e8d94046f46bd64a5c2d353"
+    }
+  },
+  "layout": {
+    "mode": "auto"
+  },
+  "components": [
+    {
+      "id": "caller",
+      "type": "external",
+      "label": "Ruby Caller",
+      "sublabel": "initial state + options",
+      "sources": [
+        {
+          "path": "README.md",
+          "line": 90,
+          "end_line": 97
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "Annealing API",
+      "sublabel": "simulate · configure",
+      "emphasis": true,
+      "sources": [
+        {
+          "path": "lib/annealing.rb",
+          "line": 13,
+          "end_line": 24
+        }
+      ]
+    },
+    {
+      "id": "simulator",
+      "type": "backend",
+      "label": "Simulator",
+      "sublabel": "merge · validate · run loop",
+      "emphasis": true,
+      "sources": [
+        {
+          "path": "lib/annealing/simulator.rb",
+          "line": 8,
+          "end_line": 26
+        },
+        {
+          "path": "lib/annealing/simulator.rb",
+          "line": 32,
+          "end_line": 59
+        }
+      ]
+    },
+    {
+      "id": "metal",
+      "type": "backend",
+      "label": "Metal",
+      "sublabel": "state · energy · acceptance",
+      "emphasis": true,
+      "sources": [
+        {
+          "path": "lib/annealing/metal.rb",
+          "line": 10,
+          "end_line": 29
+        },
+        {
+          "path": "lib/annealing/metal.rb",
+          "line": 34,
+          "end_line": 80
+        }
+      ]
+    },
+    {
+      "id": "step",
+      "type": "backend",
+      "label": "Step",
+      "sublabel": "read-only callback context",
+      "sources": [
+        {
+          "path": "lib/annealing/step.rb",
+          "line": 13,
+          "end_line": 43
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "type": "backend",
+      "label": "Configuration",
+      "sublabel": "defaults · precedence",
+      "sources": [
+        {
+          "path": "lib/annealing/configuration.rb",
+          "line": 20,
+          "end_line": 58
+        },
+        {
+          "path": "lib/annealing/configuration.rb",
+          "line": 74,
+          "end_line": 87
+        }
+      ]
+    },
+    {
+      "id": "strategies",
+      "type": "backend",
+      "label": "Coolers + Terminators",
+      "sublabel": "built-in strategy lambdas",
+      "sources": [
+        {
+          "path": "lib/annealing/configuration/coolers.rb",
+          "line": 6,
+          "end_line": 37
+        },
+        {
+          "path": "lib/annealing/configuration/terminators.rb",
+          "line": 6,
+          "end_line": 22
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "In-process Ruby library",
+      "wraps": ["api", "simulator", "metal", "step", "configuration", "strategies"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "caller-to-api",
+      "from": "caller",
+      "to": "api",
+      "label": "state + options",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-to-simulator",
+      "from": "api",
+      "to": "simulator",
+      "label": "run",
+      "variant": "emphasis"
+    },
+    {
+      "id": "simulator-to-configuration",
+      "from": "simulator",
+      "to": "configuration",
+      "label": "merge + validate"
+    },
+    {
+      "id": "configuration-to-strategies",
+      "from": "configuration",
+      "to": "strategies",
+      "label": "defaults"
+    },
+    {
+      "id": "simulator-to-metal",
+      "from": "simulator",
+      "to": "metal",
+      "label": "advance + compare",
+      "variant": "emphasis"
+    },
+    {
+      "id": "simulator-to-step",
+      "from": "simulator",
+      "to": "step",
+      "label": "pass to callbacks"
+    },
+    {
+      "id": "metal-to-step",
+      "from": "metal",
+      "to": "step",
+      "label": "construct view"
+    },
+    {
+      "id": "metal-to-configuration",
+      "from": "metal",
+      "to": "configuration",
+      "label": "invoke strategies"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Execution loop",
+      "items": [
+        "Termination is checked before each step.",
+        "Each step cools the metal, proposes a state, then accepts or rejects it."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Configuration precedence",
+      "items": [
+        "Global < Simulator instance < just-in-time options.",
+        "The merged configuration is validated when a run starts."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "State ownership",
+      "items": [
+        "Accepted moves return a new Metal.",
+        "Rejected moves mutate temperature and iteration on the current Metal."
+      ]
+    }
+  ]
+}

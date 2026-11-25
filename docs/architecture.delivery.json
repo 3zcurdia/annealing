@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e453ef0d-df3c-4b99-b0f4-8cadbc904dc4",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/luis.ezcurdia/code/annealing/.archify/architecture-annealing-20261125-144202/candidate.json",
+  "output": "/Users/luis.ezcurdia/code/annealing/docs/architecture.html",
+  "specification": {
+    "sha256": "25b0476003607a9bb6ed4654ab6c6f9e283532fed9a79dc9c10f60c936cc1f70",
+    "bytes": 4993
+  },
+  "artifact": {
+    "sha256": "2a901c72ee70951b34bb89768e041a9aa4df5ea118f701d7c970cdd5d99ac6e9",
+    "bytes": 948162
+  }
+}
