@@ -1,5 +1,15 @@
-## [Unreleased]
+## Next
 
+- Fix bug where worse states were always accepted once the temperature went negative (#37)
+- **Potentially breaking:** stricter configuration validation (#40)
+  - Unknown config keys raise `ConfigurationError` instead of being silently ignored
+  - `temperature` and `cooling_rate` must be finite floats (integers are converted); `cooling_rate`
+    must be positive (`0` used to loop forever) and `temperature` non-negative
+  - `Coolers.geometric` requires a finite ratio of at least 1.0
+- Rename `Metal#lower_energy?` to `Metal#energy_greater_than?` (#39)
+- Avoid a redundant `energy_calculator` call when `return_best` is true (#38)
+- Fix README examples and `return_best` default description, and the "algoritm" typo (#39)
+- Bump json to 2.21.2 for a use-after-free fix (#36) and refresh development dependencies
 - BREAKING: normalize the custom function interfaces (closes #17). The
   `energy_calculator`, `state_change`, `cool_down`, and `termination_condition`
   functions now each receive a single `Annealing::Step` argument instead of
