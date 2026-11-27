@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    annealing (0.4.1)
+    annealing (1.0.0)
 
 GEM
   remote: https://rubygems.org/
