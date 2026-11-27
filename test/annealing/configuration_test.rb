@@ -48,9 +48,13 @@ module Annealing
       assert_nil @subject.new.state_change
     end
 
-    def test_does_not_return_the_best_state_by_default
-      refute @subject::DEFAULT_RETURN_BEST
-      refute @subject.new.return_best
+    def test_returns_the_best_state_by_default
+      assert @subject::DEFAULT_RETURN_BEST
+      assert @subject.new.return_best
+    end
+
+    def test_can_disable_returning_the_best_state
+      refute @subject.new(return_best: false).return_best
     end
 
     def test_converts_an_integer_cooling_rate_to_a_float

@@ -51,6 +51,22 @@ class AnnealingTest < Minitest::Test
     refute_instance_of Annealing::Metal, state
   end
 
+  def test_simulate_returns_the_best_state_by_default
+    energies = { a: 5, b: 1, c: 6 }
+    state_sequence = %i[b c].each
+    call_count = 0
+    Annealing.configure do |config|
+      config.energy_calculator = ->(step) { energies.fetch(step.state) }
+      config.state_change = ->(_step) { state_sequence.next }
+      config.cool_down = ->(step) { step.temperature - 1 }
+      config.termination_condition = ->(_step) { (call_count += 1) >= 3 }
+    end
+
+    Kernel.stub(:rand, 0.0) do
+      assert_equal :b, Annealing.simulate(:a)
+    end
+  end
+
   def test_configure_returns_the_configuration
     config = Annealing.configure { |configuration| configuration.temperature = 42 }
 

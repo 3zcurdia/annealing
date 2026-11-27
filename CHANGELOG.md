@@ -1,5 +1,7 @@
 ## Next
 
+- **Breaking:** `return_best` now defaults to `true`, so simulations return the lowest-energy state
+  seen. Set `return_best: false` to preserve the previous final-state behavior (#42).
 - Fix bug where the `state_change` function received a stale step count. The count now advances
   on every step, whether or not the proposed state is accepted, so it matches the count seen by
   the `termination_condition` function (and the README).
