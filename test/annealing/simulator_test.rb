@@ -141,7 +141,7 @@ module Annealing
       state_sequence = %i[b c d].each
       call_count = 0
 
-      Kernel.stub(:rand, 0.0) do
+      stub_metal_rand(0.0) do
         simulator.run(:a,
                       energy_calculator: ->(step) { energies.fetch(step.state) },
                       state_change: ->(_step) { state_sequence.next },
