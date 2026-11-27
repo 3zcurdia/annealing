@@ -1,4 +1,6 @@
-## Next
+## [Unreleased]
+
+## [1.0.0] - 2026-11-27
 
 - **Breaking:** `return_best` now defaults to `true`, so simulations return the lowest-energy state
   seen. Set `return_best: false` to preserve the previous final-state behavior (#42).

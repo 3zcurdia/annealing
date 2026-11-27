@@ -444,7 +444,7 @@ p route.map { |loc| [loc.x, loc.y] }</code></pre>
               <tr><td><code>state_change</code></td><td>Required</td><td>Returns the next candidate state from <code>step.state</code>.</td></tr>
               <tr><td><code>temperature</code></td><td><code>10_000.0</code></td><td>Initial temperature. Higher values allow more exploration.</td></tr>
               <tr><td><code>termination_condition</code></td><td><code>Terminators.temp_is_zero?</code></td><td>Stops the simulation when it returns <code>true</code>.</td></tr>
-              <tr><td><code>return_best</code></td><td><code>false</code></td><td>Return the lowest-energy state seen, not just the final state.</td></tr>
+              <tr><td><code>return_best</code></td><td><code>true</code></td><td>Return the lowest-energy state seen, not just the final state.</td></tr>
             </tbody>
           </table>
         </div>

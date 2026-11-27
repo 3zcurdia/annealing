@@ -47,7 +47,18 @@ simulated annealing. See `README.md` for the public API and configuration preced
 - `Configuration` (lib/annealing/configuration.rb) plus concrete
   `Configuration::Coolers` and `Configuration::Terminators` provide built-in callables.
 
-## Release
+Architecture diagrams and diagnosis: use [archify](https://github.com/tt-a1i/archify). Its output
+lives in `docs/` and `.archify/`.
 
-Bump `lib/annealing/version.rb`, then `bundle exec rake release` (tags, pushes, releases
-to rubygems.org; `rubygems_mfa_required` is set in the gemspec).
+## Release parameters
+
+- Flow: release-branch (`chore/release-v<version>` branch, PR into `main`, never merged by the releasing agent).
+- Base branch: `main`. Tag: `v<version>`, lightweight, pushed only after the PR is merged.
+- Version file: `lib/annealing/version.rb` (`VERSION = "X.Y.Z"`, no `v`); also refresh `Gemfile.lock`
+  (`bundle install`).
+- Changelog: keep-a-changelog. Rotate `## [Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD`.
+- Preconditions: `bundle exec rake` (test, end_to_end_test, rubocop) passes.
+- Audit (advisory): README and `docs/index.html` match the public API; `gem build` contains only
+  `lib/`, `LICENSE`, `README.md` and `CHANGELOG.md`.
+- Publish: `bundle exec rake release` (tags, pushes, releases to rubygems.org;
+  `rubygems_mfa_required` is set in the gemspec). Never run it automatically.

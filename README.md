@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/annealing.svg)](https://badge.fury.io/rb/annealing)
 [![Ruby](https://github.com/3zcurdia/annealing/actions/workflows/ruby.yml/badge.svg)](https://github.com/3zcurdia/annealing/actions/workflows/ruby.yml)
 
-Find the optimal solution in a complex problem through a simulated annealing implementation for Ruby objects.
+Find a near-optimal solution[^1] to a complex problem through a simulated annealing implementation for Ruby objects.
 
 ## Installation
 
@@ -27,7 +27,7 @@ gem install annealing
 
 ## Usage
 
-Simulated annealing algorithms work by comparing multiple permutations of a given object and measuring their relative efficiencies based on any number of competing factors. If you aren't already familiar with the concept of simulated annealing, we recommend watching [The Most Metal Algorithm in Computer Science](https://www.youtube.com/watch?v=I_0GBWCKft8) from [SciShow](https://www.youtube.com/c/SciShow) as it will help you understand some of the concepts and terms used below.
+Simulated annealing algorithms work by comparing multiple permutations of a given object and measuring their relative efficiencies based on any number of competing factors. If you aren't already familiar with the concept of simulated annealing, we recommend watching [The Most Metal Algorithm in Computer Science](https://www.youtube.com/watch?v=I_0GBWCKft8) from [SciShow](https://www.youtube.com/c/SciShow) as it will help you understand some of the concepts and terms used below. [Simulated Annealing: The Most Metal Algorithm Ever 🤘](https://www.youtube.com/watch?v=F86BTgXSBZc&list=PLbHJudTY1K0dERpqJUEFOFSsMGvR6st9U&index=38), a RubyConf 2022 talk, also covers the algorithm and walks through using this gem.
 
 In order to use this algorithm, we must first define three things:
 
@@ -73,7 +73,7 @@ energy_calculator = lambda do |step|
 end
 ```
 
-Finally, we need a way to make small, random changes in the order of locations the salesperson will visit as we probe for an optimal route.
+Finally, we need a way to make small, random changes in the order of locations the salesperson will visit as we probe for a near-optimal route.
 
 ```ruby
 state_change = lambda do |step|
@@ -140,7 +140,7 @@ end
 
 ### `cooling_rate` and `temperature`
 
-In the default configuration, the `cooling_rate` represents the amount by which the `temperature` will be reduced at each step, such that `temperature / cooling_rate` equals the maximum number of steps the annealer will go through in its search for the optimal solution. If a custom `cool_down` function is specified then the `cooling_rate` for the simulation will be available to that function at each step via `step.cooling_rate`, along with the current temperature via `step.temperature`. The default `cooling_rate` value is `0.0003` and the default `temperature` is `10_000`.
+In the default configuration, the `cooling_rate` represents the amount by which the `temperature` will be reduced at each step, such that `temperature / cooling_rate` equals the maximum number of steps the annealer will go through in its search for a near-optimal solution. If a custom `cool_down` function is specified then the `cooling_rate` for the simulation will be available to that function at each step via `step.cooling_rate`, along with the current temperature via `step.temperature`. The default `cooling_rate` value is `0.0003` and the default `temperature` is `10_000`.
 
 ```ruby
 Annealing.configure do |config|
@@ -320,3 +320,5 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/3zcur
 ## Code of Conduct
 
 Everyone interacting in the Annealing project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/3zcurdia/annealing/blob/master/CODE_OF_CONDUCT.md).
+
+[^1]: Annealing is a heuristic: it searches well, but does not guarantee the optimal answer.
