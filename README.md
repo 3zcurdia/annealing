@@ -27,7 +27,7 @@ gem install annealing
 
 ## Usage
 
-Simulated annealing algorithms work by comparing multiple permutations of a given object and measuring their relative efficiencies based on any number of competing factors. If you aren't already familiar with the concept of simulated annealing, we recommend watching [The Most Metal Algorithm in Computer Science](https://www.youtube.com/watch?v=I_0GBWCKft8) from [SciShow](https://www.youtube.com/c/SciShow) as it will help you understand some of the concepts and terms used below.
+Simulated annealing algorithms work by comparing multiple permutations of a given object and measuring their relative efficiencies based on any number of competing factors. If you aren't already familiar with the concept of simulated annealing, we recommend watching [The Most Metal Algorithm in Computer Science](https://www.youtube.com/watch?v=I_0GBWCKft8) from [SciShow](https://www.youtube.com/c/SciShow) as it will help you understand some of the concepts and terms used below. [Simulated Annealing: The Most Metal Algorithm Ever 🤘](https://www.youtube.com/watch?v=F86BTgXSBZc&list=PLbHJudTY1K0dERpqJUEFOFSsMGvR6st9U&index=38), a RubyConf 2022 talk, also covers the algorithm and walks through using this gem.
 
 In order to use this algorithm, we must first define three things:
 
