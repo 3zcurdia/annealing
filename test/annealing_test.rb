@@ -62,7 +62,7 @@ class AnnealingTest < Minitest::Test
       config.termination_condition = ->(_step) { (call_count += 1) >= 3 }
     end
 
-    Kernel.stub(:rand, 0.0) do
+    stub_metal_rand(0.0) do
       assert_equal :b, Annealing.simulate(:a)
     end
   end
